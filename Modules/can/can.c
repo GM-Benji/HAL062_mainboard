@@ -46,13 +46,13 @@ uint8_t RxMsg[8];
 
 /* Static variables -----------------------------------------------------------*/
 
-static MessageTypeDef UART_MessageRecieved; //< Stores message from UART (bt or eth)
+MessageTypeDef UART_MessageRecieved; //< Stores message from UART (bt or eth)
 
 /* Functions ------------------------------------------------------------------*/
 
 /**
  ******************************************************************************
- * @brief        set -g status off  : Initialization of CAN1
+ * @brief          : Initialization of CAN1
  ******************************************************************************
  */
 void FDCAN1_Init(void) {
