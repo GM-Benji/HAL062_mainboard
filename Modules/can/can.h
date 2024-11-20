@@ -9,6 +9,9 @@
 #ifndef MODULES_CAN_CAN_H_
 #define MODULES_CAN_CAN_H_
 
+
+#include "leds/leds.h"
+
 /* Structures ------------------------------------------------------------------*/
 
 /**
@@ -61,18 +64,5 @@ void COM_RunUartAction(MessageTypeDef *message);
  */
 void transferTo(void);
 
-/**
- * *******************************************************************************
- * @brief		:	Passing message from UART to CAN1
- * *******************************************************************************
- */
-void transferToCan1(void);
-
-/**
- * *******************************************************************************
- * @brief		:	Passing message from UART to CAN2
- * *******************************************************************************
- */
-void transferToCan2(void);
 
 #endif /* MODULES_CAN_CAN_H_ */
