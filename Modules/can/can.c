@@ -219,18 +219,18 @@ void COM_RunUartAction(MessageTypeDef *message) {
 void transferTo() {
 	FDCAN_HandleTypeDef *hfdcan_id;
 	FDCAN_TxHeaderTypeDef *TxHeader_CAN_ID;
-	Leds_ID status_LED;
+	uint32_t status_LED;
 	
 	if (UART_MessageRecieved.ID > 0 && UART_MessageRecieved.ID <= 127) {
 		hfdcan_id = &hfdcan1; 
 		TxHeader_CAN_ID = &TxHeader_CAN1;
-		status_LED = LED5;
+		status_LED = LED_5;
 	}
 
 	if (UART_MessageRecieved.ID >= 128) {
 		hfdcan_id = &hfdcan2; 
 		TxHeader_CAN_ID = &TxHeader_CAN2;
-		status_LED = LED4;
+		status_LED = LED_4;
 	}
 
 	//CAN frame seeting

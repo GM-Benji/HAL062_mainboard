@@ -10,8 +10,6 @@
 #define MODULES_CAN_CAN_H_
 
 
-#include "leds/leds.h"
-
 /* Structures ------------------------------------------------------------------*/
 
 /**
