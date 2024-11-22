@@ -14,7 +14,6 @@
 #include <stm32h7xx_hal.h>
 #include "leds/leds.h"
 
-
 /*
  * ***************************************************
  * @ details	:	Initialization of GPIO using
@@ -31,7 +30,6 @@ void Leds_init(void) {
 	HAL_GPIO_Init(LED_PORT, &gpio);
 }
 /* Functions ------------------------------------------------------------------*/
-
 
 /*
  * ***************************************************
@@ -71,7 +69,7 @@ void Leds_toggle(uint32_t ledId) {
 void Leds_welcomeFLash(void) {
 	Leds_turnOff(LED_ALL);
 	HAL_Delay(200);
-	
+
 	Leds_turnOn(LED_1);
 	HAL_Delay(200);
 	Leds_turnOn(LED_2);

@@ -9,10 +9,8 @@
  ******************************************************************************
  */
 
-
 #ifndef MODULE_COMMUNICATION_COMMUNICATION_H
 #define MODULE_COMMUNICATION_COMMUNICATION_H
-
 
 /* Includes ------------------------------------------------------------------*/
 
@@ -21,7 +19,7 @@
 
 /* Structures -----------------------------------------------------------------*/
 
-struct commands{
+struct commands {
 	uint8_t messages[20][19];
 	uint8_t numberOfCommands;
 };
@@ -32,15 +30,14 @@ struct commands{
  * *******************************************************************************
  * @brief	:	UART ethernet initialization
  * *******************************************************************************
-*/
+ */
 bool Eth_Init();
-
 
 /**
  * *******************************************************************************
  * @brief	:	UART bluetooth initialization
  * *******************************************************************************
-*/
+ */
 bool BT_Init();
 
 /**
@@ -49,7 +46,7 @@ bool BT_Init();
  * @params ID	:	ID of data (check frame documentation)
  * @params info	:	Information to send (check frame documentation)
  * *******************************************************************************
-*/
+ */
 bool BT_sendData(char *ID, char *info);
 
 /**
@@ -58,7 +55,7 @@ bool BT_sendData(char *ID, char *info);
  * @params ID	:	ID of data (check frame documentation)
  * @params info	:	Information to send (check frame documentation)
  * *******************************************************************************
-*/
+ */
 bool Eth_sendData(uint8_t *ID, uint8_t *info);
 
 /**
@@ -66,32 +63,30 @@ bool Eth_sendData(uint8_t *ID, uint8_t *info);
  * @brief				:	Decoding data from UART
  * @params rawMessage	:	message from UART (bt or eth)
  * *******************************************************************************
-*/
-void UART_Decode(uint8_t* rawMessage);
+ */
+void UART_Decode(uint8_t *rawMessage);
 
 /**
  * *******************************************************************************
  * @brief				:	Begin listening on ethernet UART
  * *******************************************************************************
-*/
+ */
 bool Eth_ReceiveData();
 
 /**
  * *******************************************************************************
  * @brief				:	Begin listening on bluetooth UART
  * *******************************************************************************
-*/
-bool BT_ReceiveData() ;
-
+ */
+bool BT_ReceiveData();
 
 /**
  * *******************************************************************************
  * @brief				:	Watchdog to control communication failure
  * *******************************************************************************
-*/
+ */
 void Watchdog_Init(void);
 
 void UART_encode(uint8_t value, uint8_t *hex);
-
 
 #endif // MODULE_COMMUNICATION_COMMUNICATION_H

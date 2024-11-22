@@ -5,5 +5,4 @@
 
 void Cam_handle(uint8_t *data);
 
-
 #endif // MODULE_CAMERA_CAMERA_H

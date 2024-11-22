@@ -208,7 +208,6 @@ void COM_RunUartAction(MessageTypeDef *message) {
 	transferTo();
 }
 
-
 /**
  ******************************************************************************
  * @details			:	Transfers data to appropriate CAN accrording to ID:
@@ -220,15 +219,15 @@ void transferTo() {
 	FDCAN_HandleTypeDef *hfdcan_id;
 	FDCAN_TxHeaderTypeDef *TxHeader_CAN_ID;
 	uint32_t status_LED;
-	
+
 	if (UART_MessageRecieved.ID > 0 && UART_MessageRecieved.ID <= 127) {
-		hfdcan_id = &hfdcan1; 
+		hfdcan_id = &hfdcan1;
 		TxHeader_CAN_ID = &TxHeader_CAN1;
 		status_LED = LED_5;
 	}
 
 	if (UART_MessageRecieved.ID >= 128) {
-		hfdcan_id = &hfdcan2; 
+		hfdcan_id = &hfdcan2;
 		TxHeader_CAN_ID = &TxHeader_CAN2;
 		status_LED = LED_4;
 	}
@@ -252,7 +251,7 @@ void transferTo() {
 
 	//adding message to buffer
 	if (HAL_FDCAN_AddMessageToTxBuffer(hfdcan_id, TxHeader_CAN_ID, dane,
-				FDCAN_TX_BUFFER0) != HAL_OK) {
+	FDCAN_TX_BUFFER0) != HAL_OK) {
 		Error_Handler();
 	}
 
@@ -260,7 +259,8 @@ void transferTo() {
 	hfdcan1.Instance->TXBAR = 0x1u;
 
 	// Send Tx buffer message
-	if (HAL_FDCAN_EnableTxBufferRequest(hfdcan_id, FDCAN_TX_BUFFER0) != HAL_OK) {
+	if (HAL_FDCAN_EnableTxBufferRequest(hfdcan_id, FDCAN_TX_BUFFER0)
+			!= HAL_OK) {
 		Error_Handler();
 	}
 
@@ -273,10 +273,10 @@ void transferTo() {
 	Leds_toggle(status_LED);
 }
 
-
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs) {
-	
-	if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) == RESET) return;
+
+	if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) == RESET)
+		return;
 
 	if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader, RxMsg)
 			!= HAL_OK) {
@@ -285,7 +285,7 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 	}
 
 	if (hfdcan->Instance == FDCAN1) {
-		
+
 		// idk why this is here
 		//			uint8_t ID[2];
 		//			uint8_t send[16];
@@ -305,49 +305,71 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 		//			Eth_sendData(ID, send);
 
 		uint8_t angle = RxMsg[3] | (RxMsg[2] << 8) | (RxMsg[1] << 16)
-					| (RxMsg[0] << 24);
-
+				| (RxMsg[0] << 24);
 
 		switch (RxHeader.Identifier) {
-			case 158: a1.ui = angle; break;
-			case 159: a2.ui = angle; break;
-			case 160: a3.ui = angle; break;
-			case 161: a4.ui = angle; break;
-			case 162: a5.ui = angle; break;
-			case 163: a6.ui = angle; break;
+		case 158:
+			a1.ui = angle;
+			break;
+		case 159:
+			a2.ui = angle;
+			break;
+		case 160:
+			a3.ui = angle;
+			break;
+		case 161:
+			a4.ui = angle;
+			break;
+		case 162:
+			a5.ui = angle;
+			break;
+		case 163:
+			a6.ui = angle;
+			break;
 		}
-		
+
 	} else if (hfdcan->Instance == FDCAN2) {
 
 		uint8_t speed = RxMsg[3] | (RxMsg[2] << 8) | (RxMsg[1] << 16)
 				| (RxMsg[0] << 24);
 
-
 		switch (RxHeader.Identifier) {
-			case 24: s1.ui = speed; break;
-			case 25: s2.ui = speed; break;
-			case 26: s3.ui = speed; break;
-			case 27: s4.ui = speed; break;
-			case 28: s5.ui = speed; break;
-			case 29: s6.ui = speed; break;
+		case 24:
+			s1.ui = speed;
+			break;
+		case 25:
+			s2.ui = speed;
+			break;
+		case 26:
+			s3.ui = speed;
+			break;
+		case 27:
+			s4.ui = speed;
+			break;
+		case 28:
+			s5.ui = speed;
+			break;
+		case 29:
+			s6.ui = speed;
+			break;
 
-			case 60:
-				;
-				static uint8_t ID[2] = {0};
-				static uint8_t send[16] = {0};
-				static uint8_t hex[2] = {0};
-				UART_encode((uint8_t)RxHeader.Identifier, ID);
-				for(uint8_t i = 0; i<4;i++) {
-					UART_encode(RxMsg[i], hex);
-					send[2*i] = hex[0];
-					send[2*i+1] = hex[1];
-				}
-				Eth_sendData(ID, send);
+		case 60:
+			;
+			static uint8_t ID[2] = { 0 };
+			static uint8_t send[16] = { 0 };
+			static uint8_t hex[2] = { 0 };
+			UART_encode((uint8_t) RxHeader.Identifier, ID);
+			for (uint8_t i = 0; i < 4; i++) {
+				UART_encode(RxMsg[i], hex);
+				send[2 * i] = hex[0];
+				send[2 * i + 1] = hex[1];
+			}
+			Eth_sendData(ID, send);
 		}
 	}
 
 	if (HAL_FDCAN_ActivateNotification(hfdcan,
-				FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK) {
+	FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK) {
 		/* Notification Error */
 		Error_Handler();
 	}

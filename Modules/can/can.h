@@ -9,7 +9,6 @@
 #ifndef MODULES_CAN_CAN_H_
 #define MODULES_CAN_CAN_H_
 
-
 /* Structures ------------------------------------------------------------------*/
 
 /**
@@ -22,7 +21,6 @@ typedef struct {
 	uint8_t lenght;
 	uint8_t data[8];
 } MessageTypeDef;
-
 
 /* Functions ------------------------------------------------------------------*/
 
@@ -61,6 +59,5 @@ void COM_RunUartAction(MessageTypeDef *message);
  * *******************************************************************************
  */
 void transferTo(void);
-
 
 #endif /* MODULES_CAN_CAN_H_ */

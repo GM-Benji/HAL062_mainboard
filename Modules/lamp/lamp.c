@@ -5,7 +5,6 @@
 
 // look into merging this with the leds module
 
-
 uint8_t Counter_red = 0;
 uint8_t Counter_blue = 0;
 uint8_t Counter_green = 0;
@@ -13,7 +12,7 @@ uint8_t maxCounterRed = 0;
 uint8_t maxCounterBlue = 0;
 uint8_t maxCounterGreen = 0;
 
-void Lamp_setMaxValue(uint8_t *data) { 
+void Lamp_setMaxValue(uint8_t *data) {
 	maxCounterRed = data[3];
 	maxCounterBlue = data[4];
 	maxCounterGreen = data[5];
@@ -37,8 +36,7 @@ void MX_TIM16_Init(void) {
 	htim16.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htim16.Init.RepetitionCounter = 0;
 	htim16.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
-	if (HAL_TIM_Base_Init(&htim16) != HAL_OK)
-	{
+	if (HAL_TIM_Base_Init(&htim16) != HAL_OK) {
 		Error_Handler();
 	}
 	HAL_TIM_Base_Start_IT(&htim16);
@@ -55,7 +53,6 @@ void Lamp_turnOff(uint32_t lampId) {
 void Lamp_toggle(uint32_t lampId) {
 	HAL_GPIO_TogglePin(LAMP_PORT, lampId);
 }
-
 
 void Lamp_handle(uint8_t *data) {
 	// Sprawdzenie czy dane spełniają warunki i włączenie odpowiedniej diody
@@ -78,5 +75,4 @@ void Lamp_handle(uint8_t *data) {
 		Lamp_turnOff(LAMP_3);
 	}
 }
-
 

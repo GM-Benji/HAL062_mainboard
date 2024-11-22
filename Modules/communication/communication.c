@@ -17,7 +17,6 @@
 #include "lamp/lamp.h"
 #include "error_handlers/error_handlers.h"
 
-
 static GPIO_InitTypeDef ethGpio;
 static GPIO_InitTypeDef btGpio;
 
@@ -34,64 +33,49 @@ uint8_t searching = 0u;
 uint8_t magnetosearching = 0u;
 uint8_t tutaj = 0u;
 
-
 DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
 
 struct commands uartCommands;
 
-
-
-
 /**
  * *******************************************************************************
  * @brief	:	Overwritten callback after receiving message
  * *******************************************************************************
-*/
+ */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	if (huart->Instance == USART1) {
 		HAL_IWDG_Refresh(&hiwdg1);
 		UART_Decode(UART_ReceivedRaw);
-		if (UART_MessageRecieved.ID == 45  ) 
-		{
+		if (UART_MessageRecieved.ID == 45) {
 			Cam_handle(UART_MessageRecieved.data);
-		}
-		else if (UART_MessageRecieved.ID == 10  ) 
-		{
+		} else if (UART_MessageRecieved.ID == 10) {
 			Lamp_handle(UART_MessageRecieved.data);
 			Lamp_setMaxValue(UART_MessageRecieved.data);
-		}
-		else
-		{
+		} else {
 			COM_RunUartAction(&UART_MessageRecieved);
 		}
 		UART_MessageRecieved.ID = 0;
 		memset(&UART_MessageRecieved.data, 0x0u, 8);
 		HAL_UART_Receive_DMA(&ethHuart, UART_ReceivedRaw, 19);
 		return;
-		
-	}
-	else if (huart->Instance == USART3) {
+
+	} else if (huart->Instance == USART3) {
 		HAL_IWDG_Refresh(&hiwdg1);
 		UART_Decode(UART_ReceivedRaw);
-		if (UART_MessageRecieved.ID == 45  ) 
-		{
+		if (UART_MessageRecieved.ID == 45) {
 			Cam_handle(UART_MessageRecieved.data);
-		}
-		else if (UART_MessageRecieved.ID == 10  ) 
-		{
+		} else if (UART_MessageRecieved.ID == 10) {
 			Lamp_handle(UART_MessageRecieved.data);
 			Lamp_setMaxValue(UART_MessageRecieved.data);
-		}
-		else
-		{
+		} else {
 			COM_RunUartAction(&UART_MessageRecieved);
 		}
 		UART_MessageRecieved.ID = 0;
 		memset(&UART_MessageRecieved.data, 0x0u, 8);
 		HAL_UART_Receive_IT(&btHuart, UART_ReceivedRaw, 19);
 		return;
-		
+
 	}
 }
 
@@ -138,7 +122,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
  * *******************************************************************************
  * @details		: Initialization of USART3 with FIFO Queue
  * *******************************************************************************
-*/
+ */
 bool BT_Init() {
 
 	btHuart.Instance = USART3;
@@ -177,23 +161,22 @@ bool BT_Init() {
  * *******************************************************************************
  * @details		: Initialization of USART1 with FIFO Queue
  * *******************************************************************************
-*/
+ */
 bool Eth_Init() {
 
 	__HAL_RCC_DMA1_CLK_ENABLE();
 
-
-	  /* DMA interrupt init */
-	  /* DMA1_Stream0_IRQn interrupt configuration */
+	/* DMA interrupt init */
+	/* DMA1_Stream0_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
-	  /* DMA1_Stream1_IRQn interrupt configuration */
+	/* DMA1_Stream1_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
 
-    /* USART1 interrupt Init */
-    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(USART1_IRQn);
+	/* USART1 interrupt Init */
+	HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(USART1_IRQn);
 
 	ethHuart.Instance = USART1;
 	ethHuart.Init.BaudRate = 115200;
@@ -219,16 +202,15 @@ bool Eth_Init() {
  * @details		:	Initialization of watchdog that will reset board
  * 					after communcication failure
  * *******************************************************************************
-*/
-void Watchdog_Init(void){
-	  hiwdg1.Instance = IWDG1;
-	  hiwdg1.Init.Prescaler = IWDG_PRESCALER_32;
-	  hiwdg1.Init.Window = 4095;
-	  hiwdg1.Init.Reload = 4095;
-	  if (HAL_IWDG_Init(&hiwdg1) != HAL_OK)
-	  {
-	    Error_Handler();
-	  }
+ */
+void Watchdog_Init(void) {
+	hiwdg1.Instance = IWDG1;
+	hiwdg1.Init.Prescaler = IWDG_PRESCALER_32;
+	hiwdg1.Init.Window = 4095;
+	hiwdg1.Init.Reload = 4095;
+	if (HAL_IWDG_Init(&hiwdg1) != HAL_OK) {
+		Error_Handler();
+	}
 }
 
 /**
@@ -240,7 +222,7 @@ void Watchdog_Init(void){
  * 					info - depending on ID, info contains concrete data
  * @see			:	UART frame documentation
  * *******************************************************************************
-*/
+ */
 bool Eth_sendData(uint8_t *ID, uint8_t *info) {
 
 	uint8_t ethTxBuffer[19];
@@ -266,7 +248,7 @@ bool Eth_sendData(uint8_t *ID, uint8_t *info) {
  * 					info - depending on ID, info contains concrete data
  * @see			:	UART frame documentation
  * *******************************************************************************
-*/
+ */
 bool BT_sendData(char *ID, char *info) {
 
 	uint8_t btTxBuffer[19];
@@ -287,7 +269,7 @@ bool BT_sendData(char *ID, char *info) {
  * *******************************************************************************
  * @details		:	starting listening on bluetooth UART pins
  * *******************************************************************************
-*/
+ */
 bool BT_ReceiveData() {
 	if (HAL_UART_Receive_IT(&btHuart, UART_ReceivedRaw, 19) == HAL_OK)
 		return 0;
@@ -298,7 +280,7 @@ bool BT_ReceiveData() {
  * *******************************************************************************
  * @details		:	starting listening on bluetooth UART pins
  * *******************************************************************************
-*/
+ */
 bool Eth_ReceiveData() {
 	if (HAL_UART_Receive_DMA(&ethHuart, UART_ReceivedRaw, 19) == HAL_OK)
 		return 0;
@@ -312,8 +294,8 @@ bool Eth_ReceiveData() {
  * 					and 0x43 (C in ASCII)
  * @see			:	UART frame documentation
  * *******************************************************************************
-*/
-void UART_Decode(uint8_t* rawMessage) {
+ */
+void UART_Decode(uint8_t *rawMessage) {
 
 	if (rawMessage[0] != '#' && searching != 2) {
 		searching = 1;
@@ -332,10 +314,8 @@ void UART_Decode(uint8_t* rawMessage) {
 		searching = 0;
 	}
 
-
 	/*Zamiana hex w ACSII na liczbe*/
-	if(rawMessage[0] == '#')
-	{
+	if (rawMessage[0] == '#') {
 		if (rawMessage[1] >= 65)
 			UART_MessageRecieved.ID += (rawMessage[1] - 55) * 0x10;
 		else
@@ -348,16 +328,14 @@ void UART_Decode(uint8_t* rawMessage) {
 
 		uint8_t i = 3;
 		uint8_t index = 0;
-		while (i < 19 && rawMessage[i]!=88)
+		while (i < 19 && rawMessage[i] != 88)
 		//x - end of transmission
 		{
 			UART_MessageRecieved.data[index] = 0;
 			if (rawMessage[i] >= 65)
-				UART_MessageRecieved.data[index] += (rawMessage[i] - 55)
-						* 0x10;
+				UART_MessageRecieved.data[index] += (rawMessage[i] - 55) * 0x10;
 			else
-				UART_MessageRecieved.data[index] += (rawMessage[i] - 48)
-						* 0x10;
+				UART_MessageRecieved.data[index] += (rawMessage[i] - 48) * 0x10;
 			i++;
 			if (rawMessage[i] >= 65)
 				UART_MessageRecieved.data[index] += (rawMessage[i] - 55);
@@ -366,31 +344,30 @@ void UART_Decode(uint8_t* rawMessage) {
 			i++;
 			index++;
 		}
-		for(uint8_t j=index;j<8;j++){
-			UART_MessageRecieved.data[j]='X';
+		for (uint8_t j = index; j < 8; j++) {
+			UART_MessageRecieved.data[j] = 'X';
 		}
 		UART_MessageRecieved.lenght = index;
 
 	}
-	
+
 }
 
 /**
  * *******************************************************************************
  * @brief		:	Counting UART_Error. TODO Handling errors.
  * *******************************************************************************
-*/
+ */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
 
 	err_counter++;
 
 }
 
-
-
 void UART_encode(uint8_t value, uint8_t *hex) {
-    const uint8_t hex_digits[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+	const uint8_t hex_digits[16] = { '0', '1', '2', '3', '4', '5', '6', '7',
+			'8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
-    hex[0] = hex_digits[(value >> 4) & 0x0F];  // High nibble
-    hex[1] = hex_digits[value & 0x0F];         // Low nibble
+	hex[0] = hex_digits[(value >> 4) & 0x0F];  // High nibble
+	hex[1] = hex_digits[value & 0x0F];         // Low nibble
 }
