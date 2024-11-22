@@ -17,6 +17,7 @@
 #define LED_3	GPIO_PIN_4
 #define LED_4	GPIO_PIN_5
 #define LED_5	GPIO_PIN_6
+#define LED_ALL LED_1 | LED_2 | LED_3 | LED_4 | LED_5 
 #define LEDS_PORT GPIOG
 
 /* Functions ------------------------------------------------------------------*/
@@ -34,7 +35,7 @@ void Leds_init(void);
  * @param ledId	: 	Led ID
  * ***************************************************
  */
-void Leds_turnOnLed(uint32_t ledId);
+void Leds_turnOn(uint32_t ledId);
 
 /*
  * ***************************************************
@@ -42,21 +43,7 @@ void Leds_turnOnLed(uint32_t ledId);
  * @param ledId	:	Led ID
  * ***************************************************
  */
-void Leds_turnOffLed(uint32_t ledId);
-
-/*
- * ***************************************************
- * @brief 		:	Turn off all LEDs.
- * ***************************************************
- */
-void Leds_turnOffAllLeds(void);
-
-/*
- * ***************************************************
- * @ details	:	Turn on all LEDs. 
- * ***************************************************
- */
-void Leds_turnOnAllLeds(void);
+void Leds_turnOff(uint32_t ledId);
 
 /*
  * ***************************************************
@@ -64,7 +51,7 @@ void Leds_turnOnAllLeds(void);
  * @param ledId	:	Led ID
  * ***************************************************
  */
-void Leds_toggleLed(uint32_t ledId);
+void Leds_toggle(uint32_t ledId);
 
 /*
  * *************************************************************

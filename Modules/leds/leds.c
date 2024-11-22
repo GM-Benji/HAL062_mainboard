@@ -24,7 +24,7 @@
 void Leds_init(void) {
 	GPIO_InitTypeDef gpio;
 	__HAL_RCC_GPIOG_CLK_ENABLE();
-	gpio.Pin = LED_1 | LED_2 | LED_3 | LED_4 | LED_5;
+	gpio.Pin = LED_ALL;
 	gpio.Mode = GPIO_MODE_OUTPUT_PP;
 	gpio.Pull = GPIO_PULLDOWN;
 	gpio.Speed = GPIO_SPEED_FREQ_LOW;
@@ -39,7 +39,7 @@ void Leds_init(void) {
  * 					only predefined macros
  * ***************************************************
  */
-void Leds_turnOnLed(uint32_t ledId) {
+void Leds_turnOn(uint32_t ledId) {
 	HAL_GPIO_WritePin(LEDS_PORT, ledId, 0x01u);
 }
 
@@ -49,28 +49,8 @@ void Leds_turnOnLed(uint32_t ledId) {
  * 					only predefined macros
  * ***************************************************
  */
-void Leds_turnOffLed(uint32_t ledId) {
+void Leds_turnOff(uint32_t ledId) {
 	HAL_GPIO_WritePin(LEDS_PORT, ledId, 0u);
-}
-
-/*
- * *************************************************************
- * @ details	:	Turn on all LEDs. 
- * *************************************************************
- */
-void Leds_turnOnAllLeds(void) {
-	uint32_t reg = LED_1 | LED_2 | LED_3 | LED_4 | LED_5;
-	HAL_GPIO_WritePin(LEDS_PORT, reg, 0x01u);
-}
-
-/*
- * *************************************************************
- * @ details	:	Turn off all LEDs. 
- * *************************************************************
- */
-void Leds_turnOffAllLeds(void) {
-	uint32_t reg = LED_1 | LED_2 | LED_3 | LED_4 | LED_5;
-	HAL_GPIO_WritePin(LEDS_PORT, reg, 0u);
 }
 
 /*
@@ -78,7 +58,7 @@ void Leds_turnOffAllLeds(void) {
  * @ details	:	Toggling LED using predefined macro
  * *****************************************************
  */
-void Leds_toggleLed(uint32_t ledId) {
+void Leds_toggle(uint32_t ledId) {
 	HAL_GPIO_TogglePin(LEDS_PORT, ledId);
 }
 
@@ -89,9 +69,26 @@ void Leds_toggleLed(uint32_t ledId) {
  * *****************************************************
  */
 void Leds_welcomeFLash(void) {
-	Leds_turnOnAllLeds();
-	HAL_Delay(1000);
+	Leds_turnOff(LED_ALL);
+	HAL_Delay(200);
+	
+	Leds_turnOn(LED_1);
+	HAL_Delay(200);
+	Leds_turnOn(LED_2);
+	HAL_Delay(200);
+	Leds_turnOn(LED_3);
+	HAL_Delay(200);
+	Leds_turnOn(LED_4);
+	HAL_Delay(200);
+	Leds_turnOn(LED_5);
+	HAL_Delay(200);
 
-	Leds_turnOffAllLeds();
-	HAL_Delay(1000);
+	Leds_turnOff(LED_ALL);
+	HAL_Delay(200);
+
+	Leds_turnOn(LED_ALL);
+	HAL_Delay(400);
+
+	Leds_turnOff(LED_ALL);
+	HAL_Delay(200);
 }

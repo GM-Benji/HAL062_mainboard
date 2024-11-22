@@ -270,7 +270,7 @@ void transferTo() {
 	}
 
 	// Toggle LED5 to know that message was sent
-	Leds_toggleLed(status_LED);
+	Leds_toggle(status_LED);
 }
 
 
