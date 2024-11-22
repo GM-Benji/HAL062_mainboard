@@ -14,6 +14,7 @@
 #include "can/can.h"
 #include "timers.h"
 #include "lamp/lamp.h"
+
 TIM_HandleTypeDef htim7;
 TIM_HandleTypeDef htim4;
 extern struct commands uartCommands;
@@ -155,19 +156,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		    // Sprawdzenie, czy osiągnięto wartości maksymalne
 		    if (Counter_red == maxCounterRed) {
 		        // Zmiana stanu diody czerwonej
-		        HAL_GPIO_TogglePin(LED_PORT, LED1_PIN);
+		    	Lamp_toggle(LAMP_1); 
 		        // Resetowanie licznika
 		        Counter_red = 0;
 		    }
 		    if (Counter_blue == maxCounterBlue) {
 		        // Zmiana stanu diody niebieskiej
-		        HAL_GPIO_TogglePin(LED_PORT, LED2_PIN);
+		    	Lamp_toggle(LAMP_2); 
 		        // Resetowanie licznika
 		        Counter_blue = 0;
 		    }
 		    if (Counter_green == maxCounterGreen) {
 		        // Zmiana stanu diody zielonej
-		        HAL_GPIO_TogglePin(LED_PORT, LED3_PIN);
+		    	Lamp_toggle(LAMP_3); 
 		        // Resetowanie licznika
 		        Counter_green = 0;
 		    }

@@ -28,7 +28,7 @@ void Leds_init(void) {
 	gpio.Mode = GPIO_MODE_OUTPUT_PP;
 	gpio.Pull = GPIO_PULLDOWN;
 	gpio.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(GPIOG, &gpio);
+	HAL_GPIO_Init(LED_PORT, &gpio);
 }
 /* Functions ------------------------------------------------------------------*/
 
@@ -40,7 +40,7 @@ void Leds_init(void) {
  * ***************************************************
  */
 void Leds_turnOn(uint32_t ledId) {
-	HAL_GPIO_WritePin(LEDS_PORT, ledId, 0x01u);
+	HAL_GPIO_WritePin(LED_PORT, ledId, GPIO_PIN_SET);
 }
 
 /*
@@ -50,7 +50,7 @@ void Leds_turnOn(uint32_t ledId) {
  * ***************************************************
  */
 void Leds_turnOff(uint32_t ledId) {
-	HAL_GPIO_WritePin(LEDS_PORT, ledId, 0u);
+	HAL_GPIO_WritePin(LED_PORT, ledId, GPIO_PIN_RESET);
 }
 
 /*
@@ -59,7 +59,7 @@ void Leds_turnOff(uint32_t ledId) {
  * *****************************************************
  */
 void Leds_toggle(uint32_t ledId) {
-	HAL_GPIO_TogglePin(LEDS_PORT, ledId);
+	HAL_GPIO_TogglePin(LED_PORT, ledId);
 }
 
 /*

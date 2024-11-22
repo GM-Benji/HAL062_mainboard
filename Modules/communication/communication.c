@@ -58,8 +58,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		}
 		else if (UART_MessageRecieved.ID == 10  ) 
 		{
-			handleLED(UART_MessageRecieved.data);
-			Set_Max_Value(UART_MessageRecieved.data);
+			Lamp_handle(UART_MessageRecieved.data);
+			Lamp_setMaxValue(UART_MessageRecieved.data);
 		}
 		else
 		{
@@ -80,8 +80,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		}
 		else if (UART_MessageRecieved.ID == 10  ) 
 		{
-			handleLED(UART_MessageRecieved.data);
-			Set_Max_Value(UART_MessageRecieved.data);
+			Lamp_handle(UART_MessageRecieved.data);
+			Lamp_setMaxValue(UART_MessageRecieved.data);
 		}
 		else
 		{

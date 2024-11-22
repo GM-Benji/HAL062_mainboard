@@ -18,7 +18,7 @@
 #define LED_4	GPIO_PIN_5
 #define LED_5	GPIO_PIN_6
 #define LED_ALL LED_1 | LED_2 | LED_3 | LED_4 | LED_5 
-#define LEDS_PORT GPIOG
+#define LED_PORT GPIOG
 
 /* Functions ------------------------------------------------------------------*/
 
