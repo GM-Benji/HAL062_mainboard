@@ -54,7 +54,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		UART_Decode(UART_ReceivedRaw);
 		if (UART_MessageRecieved.ID == 45  ) 
 		{
-			handleCamera(UART_MessageRecieved.data);
+			Cam_handle(UART_MessageRecieved.data);
 		}
 		else if (UART_MessageRecieved.ID == 10  ) 
 		{
@@ -76,7 +76,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		UART_Decode(UART_ReceivedRaw);
 		if (UART_MessageRecieved.ID == 45  ) 
 		{
-			handleCamera(UART_MessageRecieved.data);
+			Cam_handle(UART_MessageRecieved.data);
 		}
 		else if (UART_MessageRecieved.ID == 10  ) 
 		{
