@@ -26,7 +26,7 @@ typedef enum
     TIM4Error_configSync,
     TIM4Error_configChannel,
     TIM7Error_baseInit,
-    TIM7Error_configSync
+    TIM7Error_configSync,
 	SRCError_mainOscConfig,
 	SRCError_mainClockConfig,
     HALError_CAN1,
