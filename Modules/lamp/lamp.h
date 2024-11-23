@@ -6,8 +6,6 @@
 #define LAMP_3 113
 #define LAMP_PORT GPIOC
 
-extern TIM_HandleTypeDef htim16;
-
 void Lamp_setMaxValue(uint8_t *data);
 void Lamp_init();
 void MX_TIM16_Init(void);

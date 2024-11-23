@@ -13,6 +13,7 @@
 #include "communication/communication.h"
 #include "error_handlers/error_handlers.h"
 #include "timers/timers.h"
+#include "camera/camera.h"
 
 void SystemClock_Config(void);
 

@@ -28,20 +28,6 @@ void Lamp_init() {
 	HAL_GPIO_Init(LAMP_PORT, &GPIO_InitStruct);
 }
 
-void MX_TIM16_Init(void) {
-	htim16.Instance = TIM16;
-	htim16.Init.Prescaler = 7199;
-	htim16.Init.CounterMode = TIM_COUNTERMODE_UP;
-	htim16.Init.Period = 99;
-	htim16.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-	htim16.Init.RepetitionCounter = 0;
-	htim16.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
-	if (HAL_TIM_Base_Init(&htim16) != HAL_OK) {
-		Error_Handler();
-	}
-	HAL_TIM_Base_Start_IT(&htim16);
-}
-
 void Lamp_turnOn(uint32_t lampId) {
 	HAL_GPIO_WritePin(LAMP_PORT, lampId, GPIO_PIN_SET);
 }
