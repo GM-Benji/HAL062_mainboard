@@ -29,21 +29,21 @@ typedef struct {
  * @brief		:	CAN1 initialization - outside (manipulator/lab)
  * *******************************************************************************
  */
-void FDCAN1_Init(void);
+void CAN1_Init(void);
 
 /**
  * *******************************************************************************
  * @brief		:	CAN2 initialization - rail (motorboards/sensorboards)
  * *******************************************************************************
  */
-void FDCAN2_Init(void);
+void CAN2_Init(void);
 
 /**
  * *******************************************************************************
  * @brief		:	Send test message via CAN1
  * *******************************************************************************
  */
-void Can_testMessage(void);
+void CAN_testMessage(void);
 
 /**
  * *******************************************************************************
@@ -58,6 +58,13 @@ void COM_RunUartAction(MessageTypeDef *message);
  * @brief		:	Checks ID of message and pass to CAN1 or CAN2
  * *******************************************************************************
  */
-void transferTo(void);
+void CAN_transferTo(void);
+
+void CAN1_transfer(void);
+void CAN2_transfer(void);
+
+void CAN1_processFifo0(uint32_t RxFifo0ITs);
+void CAN2_processFifo0(uint32_t RxFifo0ITs);
+
 
 #endif /* MODULES_CAN_CAN_H_ */

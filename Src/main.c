@@ -32,8 +32,8 @@ int main(void) {
 	Leds_init(); //< Initialization of LEDs pins
 	Leds_welcomeFLash(); //< All LEDs flash (test LEDs performance)
 
-	FDCAN1_Init(); //< Initialization of CAN1 - rail (motorboards, sensorboards)
-	FDCAN2_Init(); //< Initialization of CAN 2 - manip/labo
+	CAN1_Init(); //< Initialization of CAN1 - rail (motorboards, sensorboards)
+	CAN2_Init(); //< Initialization of CAN 2 - manip/labo
 
 	Eth_Init(); //< Initialization of UART ethernet
 	Eth_ReceiveData(); //< Starting listening on ethernet uart pins

@@ -38,8 +38,8 @@ typedef union Speed {
 	float f;
 } Speed;
 
-Angle a1, a2, a3, a4, a5, a6;
-Speed s1, s2, s3, s4, s5, s6;
+Angle angles[6];
+Speed speeds[6];
 
 uint8_t testData[] = { 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xFA, 0xFB, 0xFC };
 uint8_t RxMsg[8];
@@ -55,7 +55,7 @@ MessageTypeDef UART_MessageRecieved; //< Stores message from UART (bt or eth)
  * @brief          : Initialization of CAN1
  ******************************************************************************
  */
-void FDCAN1_Init(void) {
+void CAN1_Init(void) {
 
 	FDCAN_FilterTypeDef sFilterConfig;
 
@@ -117,7 +117,7 @@ void FDCAN1_Init(void) {
  ******************************************************************************
  */
 
-void FDCAN2_Init(void) {
+void CAN2_Init(void) {
 
 	FDCAN_FilterTypeDef sFilterConfig;
 
@@ -184,7 +184,7 @@ void FDCAN2_Init(void) {
  * 					 { 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xFA, 0xFB, 0xFC };
  ******************************************************************************
  */
-void Can_testMessage(void) {
+void CAN_testMessage(void) {
 	MessageTypeDef message;
 
 	message.ID = 0x01;
@@ -205,7 +205,7 @@ void COM_RunUartAction(MessageTypeDef *message) {
 	UART_MessageRecieved.ID = message->ID;
 	memcpy(UART_MessageRecieved.data, message->data, 8);
 	UART_MessageRecieved.lenght = message->lenght;
-	transferTo();
+	CAN_transferTo();
 }
 
 /**
@@ -215,24 +215,24 @@ void COM_RunUartAction(MessageTypeDef *message) {
  * 						[128-256) - CAN1 (outside - manipulator/lab)
  ******************************************************************************
  */
-void transferTo() {
-	FDCAN_HandleTypeDef *hfdcan_id;
-	FDCAN_TxHeaderTypeDef *TxHeader_CAN_ID;
-	uint32_t status_LED;
-
+void CAN_transferTo(void) {
 	if (UART_MessageRecieved.ID > 0 && UART_MessageRecieved.ID <= 127) {
-		hfdcan_id = &hfdcan1;
-		TxHeader_CAN_ID = &TxHeader_CAN1;
-		status_LED = LED_5;
+		CAN1_transfer();
 	}
 
 	if (UART_MessageRecieved.ID >= 128) {
-		hfdcan_id = &hfdcan2;
-		TxHeader_CAN_ID = &TxHeader_CAN2;
-		status_LED = LED_4;
+		CAN2_transfer();
 	}
+}
 
-	//CAN frame seeting
+/**
+ ******************************************************************************
+ * @brief         	: Transfer data via CAN1 - outside (manipulator/lab)
+ ******************************************************************************
+ */
+void CAN1_transfer(void) {
+
+	//CAN1 frame seeting
 	TxHeader_CAN1.Identifier = UART_MessageRecieved.ID; 	//< ID of message
 	TxHeader_CAN1.IdType = FDCAN_STANDARD_ID; 			//< Standard ID is used
 	TxHeader_CAN1.TxFrameType = FDCAN_DATA_FRAME; 	//< Frame to transfer data
@@ -250,7 +250,7 @@ void transferTo() {
 	}
 
 	//adding message to buffer
-	if (HAL_FDCAN_AddMessageToTxBuffer(hfdcan_id, TxHeader_CAN_ID, dane,
+	if (HAL_FDCAN_AddMessageToTxBuffer(&hfdcan1, &TxHeader_CAN1, dane,
 	FDCAN_TX_BUFFER0) != HAL_OK) {
 		Error_Handler();
 	}
@@ -259,18 +259,136 @@ void transferTo() {
 	hfdcan1.Instance->TXBAR = 0x1u;
 
 	// Send Tx buffer message
-	if (HAL_FDCAN_EnableTxBufferRequest(hfdcan_id, FDCAN_TX_BUFFER0)
-			!= HAL_OK) {
+	if (HAL_FDCAN_EnableTxBufferRequest(&hfdcan1, FDCAN_TX_BUFFER0) != HAL_OK) {
 		Error_Handler();
 	}
 
 	// Polling for transmission complete on buffer index 0
-	while (HAL_FDCAN_IsTxBufferMessagePending(hfdcan_id, FDCAN_TX_BUFFER0) == 1) {
+	while (HAL_FDCAN_IsTxBufferMessagePending(&hfdcan1, FDCAN_TX_BUFFER0) == 1) {
 		__NOP();
 	}
 
 	// Toggle LED5 to know that message was sent
-	Leds_toggle(status_LED);
+	Leds_toggle(LED_5);
+}
+
+/**
+ ******************************************************************************
+ * @brief         	: Transfer data via CAN2 - rail (motorboards/sensorboards)
+ ******************************************************************************
+ */
+void CAN2_transfer(void) {
+
+	//CAN2 frame seeting
+	TxHeader_CAN2.Identifier = UART_MessageRecieved.ID;		//< ID of message
+	TxHeader_CAN2.IdType = FDCAN_STANDARD_ID; 			//< Standard ID is used
+	TxHeader_CAN2.TxFrameType = FDCAN_DATA_FRAME; 	//< Frame to transfer data
+	TxHeader_CAN2.DataLength = FDCAN_DLC_BYTES_8; 			//< 8 BYTES of data
+	TxHeader_CAN2.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+	TxHeader_CAN2.BitRateSwitch = FDCAN_BRS_ON;
+	TxHeader_CAN2.FDFormat = FDCAN_CLASSIC_CAN;
+	TxHeader_CAN2.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+	TxHeader_CAN2.MessageMarker = 0x0; 	//< Ignore because FDCAN_NO_TX_EVENTS
+
+	//creating local data table to send
+	uint8_t dane[8];
+	for (int i = 0; i < 8; i++) {
+		dane[i] = UART_MessageRecieved.data[i];
+	}
+
+	//adding message to buffer
+	if (HAL_FDCAN_AddMessageToTxBuffer(&hfdcan2, &TxHeader_CAN2, dane,
+	FDCAN_TX_BUFFER0) != HAL_OK) {
+		Error_Handler();
+	}
+
+	//activating transmision request flag
+	hfdcan2.Instance->TXBAR = 0x1u;
+
+	// Send Tx buffer message
+	if (HAL_FDCAN_EnableTxBufferRequest(&hfdcan2, FDCAN_TX_BUFFER0) != HAL_OK) {
+		Error_Handler();
+	}
+
+	// Polling for transmission complete on buffer index 0
+	while (HAL_FDCAN_IsTxBufferMessagePending(&hfdcan2, FDCAN_TX_BUFFER0) == 1) {
+		__NOP();
+	}
+
+	// Toggle LED_4 to know that message was sent
+	Leds_toggle(LED_4);
+}
+
+void CAN1_processFifo0(uint32_t RxFifo0ITs) {
+
+	if (HAL_FDCAN_GetRxMessage(&hfdcan1, FDCAN_RX_FIFO0, &RxHeader, RxMsg)
+			!= HAL_OK) {
+		/* Reception Error */
+		Error_Handler();
+	}
+
+	// some legacy code 
+	//			uint8_t ID[2];
+	//			uint8_t send[16];
+	//			uint8_t hex[2];
+	//			UART_encode((uint8_t)RxHeader.Identifier, ID);
+	//			for(uint8_t i = 0; i<4;i++)
+	//			{
+	//
+	//				UART_encode(RxMsg[i], hex);
+	//				send[2*i] = hex[0];
+	//				send[2*i+1] = hex[1];
+	//			}
+	////			for(uint8_t i = 0; i<(16-RxHeader.DataLength*2);i++)
+	////			{
+	////				send[i+RxHeader.DataLength*2] = 'x';
+	////			}
+	//			Eth_sendData(ID, send);
+
+	switch (RxHeader.Identifier) {
+	case 158 ... 163:
+		angles[RxHeader.Identifier - 158].ui = RxMsg[3] | (RxMsg[2] << 8)
+				| (RxMsg[1] << 16) | (RxMsg[0] << 24);
+	}
+
+	if (HAL_FDCAN_ActivateNotification(&hfdcan1,
+	FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK) {
+		/* Notification Error */
+		Error_Handler();
+	}
+}
+
+void CAN2_processFifo0(uint32_t RxFifo0ITs) {
+	if (HAL_FDCAN_GetRxMessage(&hfdcan2, FDCAN_RX_FIFO0, &RxHeader, RxMsg)
+			!= HAL_OK) {
+		/* Reception Error */
+		Error_Handler();
+	}
+
+	switch (RxHeader.Identifier) {
+	case 24 ... 29:
+		speeds[RxHeader.Identifier - 24].ui = RxMsg[3] | (RxMsg[2] << 8)
+				| (RxMsg[1] << 16) | (RxMsg[0] << 24);
+
+	case 60:
+		;
+		static uint8_t ID[2] = { 0 };
+		static uint8_t send[16] = { 0 };
+		static uint8_t hex[2] = { 0 };
+		UART_encode((uint8_t) RxHeader.Identifier, ID);
+		for (uint8_t i = 0; i < 4; i++) {
+			UART_encode(RxMsg[i], hex);
+			send[2 * i] = hex[0];
+			send[2 * i + 1] = hex[1];
+		}
+		Eth_sendData(ID, send);
+	}
+
+	if (HAL_FDCAN_ActivateNotification(&hfdcan2,
+	FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK) {
+		/* Notification Error */
+		Error_Handler();
+	}
 }
 
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs) {
@@ -278,100 +396,14 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 	if ((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) == RESET)
 		return;
 
-	if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader, RxMsg)
-			!= HAL_OK) {
-		/* Reception Error */
-		Error_Handler();
-	}
-
 	if (hfdcan->Instance == FDCAN1) {
-
-		// idk why this is here
-		//			uint8_t ID[2];
-		//			uint8_t send[16];
-		//			uint8_t hex[2];
-		//			UART_encode((uint8_t)RxHeader.Identifier, ID);
-		//			for(uint8_t i = 0; i<4;i++)
-		//			{
-		//
-		//				UART_encode(RxMsg[i], hex);
-		//				send[2*i] = hex[0];
-		//				send[2*i+1] = hex[1];
-		//			}
-		////			for(uint8_t i = 0; i<(16-RxHeader.DataLength*2);i++)
-		////			{
-		////				send[i+RxHeader.DataLength*2] = 'x';
-		////			}
-		//			Eth_sendData(ID, send);
-
-		uint8_t angle = RxMsg[3] | (RxMsg[2] << 8) | (RxMsg[1] << 16)
-				| (RxMsg[0] << 24);
-
-		switch (RxHeader.Identifier) {
-		case 158:
-			a1.ui = angle;
-			break;
-		case 159:
-			a2.ui = angle;
-			break;
-		case 160:
-			a3.ui = angle;
-			break;
-		case 161:
-			a4.ui = angle;
-			break;
-		case 162:
-			a5.ui = angle;
-			break;
-		case 163:
-			a6.ui = angle;
-			break;
-		}
-
-	} else if (hfdcan->Instance == FDCAN2) {
-
-		uint8_t speed = RxMsg[3] | (RxMsg[2] << 8) | (RxMsg[1] << 16)
-				| (RxMsg[0] << 24);
-
-		switch (RxHeader.Identifier) {
-		case 24:
-			s1.ui = speed;
-			break;
-		case 25:
-			s2.ui = speed;
-			break;
-		case 26:
-			s3.ui = speed;
-			break;
-		case 27:
-			s4.ui = speed;
-			break;
-		case 28:
-			s5.ui = speed;
-			break;
-		case 29:
-			s6.ui = speed;
-			break;
-
-		case 60:
-			;
-			static uint8_t ID[2] = { 0 };
-			static uint8_t send[16] = { 0 };
-			static uint8_t hex[2] = { 0 };
-			UART_encode((uint8_t) RxHeader.Identifier, ID);
-			for (uint8_t i = 0; i < 4; i++) {
-				UART_encode(RxMsg[i], hex);
-				send[2 * i] = hex[0];
-				send[2 * i + 1] = hex[1];
-			}
-			Eth_sendData(ID, send);
-		}
+		CAN1_processFifo0(RxFifo0ITs);
+		return;
 	}
 
-	if (HAL_FDCAN_ActivateNotification(hfdcan,
-	FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK) {
-		/* Notification Error */
-		Error_Handler();
+	if (hfdcan->Instance == FDCAN2) {
+		CAN2_processFifo0(RxFifo0ITs);
+		return;
 	}
 }
 

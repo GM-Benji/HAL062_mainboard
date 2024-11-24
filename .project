@@ -28,10 +28,4 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
-	<variableList>
-		<variable>
-			<name>hal</name>
-			<value>file:/C:/Users/benia/Downloads/stm32h7xx_hal_driver/stm32h7xx_hal_driver</value>
-		</variable>
-	</variableList>
 </projectDescription>
