@@ -209,7 +209,8 @@ void Watchdog_Init(void) {
 	hiwdg1.Init.Window = 4095;
 	hiwdg1.Init.Reload = 4095;
 	if (HAL_IWDG_Init(&hiwdg1) != HAL_OK) {
-		Error_Handler();
+		Error_Handler(COMError_watchdogInit, COMError_watchdogInit);
+		return;
 	}
 }
 
@@ -249,7 +250,7 @@ bool Eth_sendData(uint8_t *ID, uint8_t *info) {
  * @see			:	UART frame documentation
  * *******************************************************************************
  */
-bool BT_sendData(char *ID, char *info) {
+bool BT_sendData(uint8_t *ID, uint8_t *info) {
 
 	uint8_t btTxBuffer[19];
 	btTxBuffer[0] = '#';
@@ -359,10 +360,22 @@ void UART_Decode(uint8_t *rawMessage) {
  * *******************************************************************************
  */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
+	
+	if (huart->Instance == btHuart.Instance) {
+		Error_Handler(COMErrorFunc_BT, COMError_BT);
+		return;
+	}
+
+	if (huart->Instance == ethHuart.Instance) {
+		Error_Handler(COMErrorFunc_ETH, COMError_ETH);
+		return;
+	} 
+
 
 	err_counter++;
 
 }
+
 
 void UART_encode(uint8_t value, uint8_t *hex) {
 	const uint8_t hex_digits[16] = { '0', '1', '2', '3', '4', '5', '6', '7',

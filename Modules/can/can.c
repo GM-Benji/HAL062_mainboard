@@ -88,7 +88,8 @@ void CAN1_Init(void) {
 	hfdcan1.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
 	hfdcan1.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
 	if (HAL_FDCAN_Init(&hfdcan1) != HAL_OK) {
-		Error_Handler(CAN1Error_init);
+		Error_Handler(CAN1ErrorFunc_init, CAN1Error_init);
+		return;
 	}
 
 	/* Configure standard ID reception filter to Rx buffer 0 */
@@ -100,12 +101,14 @@ void CAN1_Init(void) {
 	sFilterConfig.FilterID2 = 0xFFFFFFFF; // Ignore because FDCAN_FILTER_TO_RXBUFFER
 	sFilterConfig.RxBufferIndex = 0;
 	if (HAL_FDCAN_ConfigFilter(&hfdcan1, &sFilterConfig) != HAL_OK) {
-		Error_Handler(CAN1Error_configFilter);
+		Error_Handler(CAN1ErrorFunc_init, CAN1Error_configFilter);
+		return;
 	}
 
 	/* Start the FDCAN module */
 	if (HAL_FDCAN_Start(&hfdcan1) != HAL_OK) {
-		Error_Handler(CAN1Error_start);
+		Error_Handler(CAN1ErrorFunc_init, CAN1Error_start);
+		return;
 	}
 
 	HAL_FDCAN_ActivateNotification(&hfdcan1, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
@@ -151,7 +154,8 @@ void CAN2_Init(void) {
 	hfdcan2.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
 
 	if (HAL_FDCAN_Init(&hfdcan2) != HAL_OK) {
-		Error_Handler(CAN2Error_init);
+		Error_Handler(CAN1ErrorFunc_init, CAN2Error_init);
+		return;
 	}
 
 	/* Configure standard ID reception filter to Rx buffer 0 */
@@ -166,12 +170,14 @@ void CAN2_Init(void) {
 	sFilterConfig.FilterID2 = 0xFFFFFFFF; // Ignore because FDCAN_FILTER_TO_RXBUFFER
 	sFilterConfig.RxBufferIndex = 0;
 	if (HAL_FDCAN_ConfigFilter(&hfdcan2, &sFilterConfig) != HAL_OK) {
-		Error_Handler(CAN2Error_configFilter);
+		Error_Handler(CAN2ErrorFunc_init, CAN2Error_configFilter);
+		return;
 	}
 
 	/* Start the FDCAN module */
 	if (HAL_FDCAN_Start(&hfdcan2) != HAL_OK) {
-		Error_Handler(CAN2Error_start);
+		Error_Handler(CAN2ErrorFunc_init, CAN2Error_start);
+		return;
 	}
 
 	HAL_FDCAN_ActivateNotification(&hfdcan2, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
@@ -205,23 +211,15 @@ void COM_RunUartAction(MessageTypeDef *message) {
 	UART_MessageRecieved.ID = message->ID;
 	memcpy(UART_MessageRecieved.data, message->data, 8);
 	UART_MessageRecieved.lenght = message->lenght;
-	CAN_transferTo();
-}
 
-/**
- ******************************************************************************
- * @details			:	Transfers data to appropriate CAN accrording to ID:
- * 						(0-127] - CAN2 (rail - motorboards/sensorboards)
- * 						[128-256) - CAN1 (outside - manipulator/lab)
- ******************************************************************************
- */
-void CAN_transferTo(void) {
 	if (UART_MessageRecieved.ID > 0 && UART_MessageRecieved.ID <= 127) {
 		CAN1_transfer();
+		return;
 	}
 
 	if (UART_MessageRecieved.ID >= 128) {
 		CAN2_transfer();
+		return;
 	}
 }
 
@@ -252,7 +250,8 @@ void CAN1_transfer(void) {
 	//adding message to buffer
 	if (HAL_FDCAN_AddMessageToTxBuffer(&hfdcan1, &TxHeader_CAN1, dane,
 	FDCAN_TX_BUFFER0) != HAL_OK) {
-		Error_Handler(CAN1Error_transferAddMessege);
+		Error_Handler(CAN1ErrorFunc_transfer, CAN1Error_transferAddMessege);
+		return;
 	}
 
 	//activating transmision request flag
@@ -260,7 +259,8 @@ void CAN1_transfer(void) {
 
 	// Send Tx buffer message
 	if (HAL_FDCAN_EnableTxBufferRequest(&hfdcan1, FDCAN_TX_BUFFER0) != HAL_OK) {
-		Error_Handler(CAN1Error_transferEnableTx);
+		Error_Handler(CAN1ErrorFunc_transfer, CAN1Error_transferEnableTx);
+		return;
 	}
 
 	// Polling for transmission complete on buffer index 0
@@ -299,7 +299,8 @@ void CAN2_transfer(void) {
 	//adding message to buffer
 	if (HAL_FDCAN_AddMessageToTxBuffer(&hfdcan2, &TxHeader_CAN2, dane,
 	FDCAN_TX_BUFFER0) != HAL_OK) {
-		Error_Handler(CAN2Error_transferAddMessege);
+		Error_Handler(CAN2ErrorFunc_transfer, CAN2Error_transferAddMessege);
+		return;
 	}
 
 	//activating transmision request flag
@@ -307,7 +308,8 @@ void CAN2_transfer(void) {
 
 	// Send Tx buffer message
 	if (HAL_FDCAN_EnableTxBufferRequest(&hfdcan2, FDCAN_TX_BUFFER0) != HAL_OK) {
-		Error_Handler(CAN2Error_transferEnableTx);
+		Error_Handler(CAN2ErrorFunc_transfer, CAN2Error_transferEnableTx);
+		return;
 	}
 
 	// Polling for transmission complete on buffer index 0
@@ -324,7 +326,8 @@ void CAN1_processFifo0(uint32_t RxFifo0ITs) {
 	if (HAL_FDCAN_GetRxMessage(&hfdcan1, FDCAN_RX_FIFO0, &RxHeader, RxMsg)
 			!= HAL_OK) {
 		/* Reception Error */
-		Error_Handler(CAN1Error_fifoGetMessege);
+		Error_Handler(CAN1ErrorFunc_fifo, CAN1Error_fifoGetMessege);
+		return;
 	}
 
 	// some legacy code 
@@ -354,7 +357,8 @@ void CAN1_processFifo0(uint32_t RxFifo0ITs) {
 	if (HAL_FDCAN_ActivateNotification(&hfdcan1,
 	FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK) {
 		/* Notification Error */
-		Error_Handler(CAN1Error_fifoActivateNotification);
+		Error_Handler(CAN1ErrorFunc_fifo, CAN1Error_fifoActivateNotification);
+		return;
 	}
 }
 
@@ -362,7 +366,8 @@ void CAN2_processFifo0(uint32_t RxFifo0ITs) {
 	if (HAL_FDCAN_GetRxMessage(&hfdcan2, FDCAN_RX_FIFO0, &RxHeader, RxMsg)
 			!= HAL_OK) {
 		/* Reception Error */
-		Error_Handler(CAN2Error_fifoGetMessege);
+		Error_Handler(CAN2ErrorFunc_fifo, CAN2Error_fifoGetMessege);
+		return;
 	}
 
 	switch (RxHeader.Identifier) {
@@ -387,7 +392,8 @@ void CAN2_processFifo0(uint32_t RxFifo0ITs) {
 	if (HAL_FDCAN_ActivateNotification(&hfdcan2,
 	FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK) {
 		/* Notification Error */
-		Error_Handler(CAN2Error_fifoActivateNotification);
+		Error_Handler(CAN2ErrorFunc_fifo, CAN2Error_fifoActivateNotification);
+		return;
 	}
 }
 

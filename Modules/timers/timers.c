@@ -44,35 +44,42 @@ void TIM4_Init() {
 	htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 	if (HAL_TIM_Base_Init(&htim4) != HAL_OK) {
-		Error_Handler();
+		Error_Handler(TIM4ErrorFunc_init, TIM4Error_baseInit);
+		return;
 	}
 	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
 	if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK) {
-		Error_Handler();
+		Error_Handler(TIM4ErrorFunc_init, TIM4Error_configClock);
+		return;
 	}
 	if (HAL_TIM_OC_Init(&htim4) != HAL_OK) {
-		Error_Handler();
+		Error_Handler(TIM4ErrorFunc_init, TIM4Error_OCInit);
+		return;
 	}
 	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
 	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
 	if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig)
 			!= HAL_OK) {
-		Error_Handler();
+		Error_Handler(TIM4ErrorFunc_init, TIM4Error_configSync);
+		return;
 	}
 	sConfigOC.OCMode = TIM_OCMODE_TIMING;
 	sConfigOC.Pulse = 1500;
 	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
 	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
 	if (HAL_TIM_OC_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_1) != HAL_OK) {
-		Error_Handler();
+		Error_Handler(TIM4ErrorFunc_init, TIM4Error_configChannel);
+		return;
 	}
 	sConfigOC.Pulse = 1000;
 	if (HAL_TIM_OC_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_2) != HAL_OK) {
-		Error_Handler();
+		Error_Handler(TIM4ErrorFunc_init, TIM4Error_configChannel);
+		return;
 	}
 	sConfigOC.Pulse = 2000;
 	if (HAL_TIM_OC_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_3) != HAL_OK) {
-		Error_Handler();
+		Error_Handler(TIM4ErrorFunc_init, TIM4Error_configChannel);
+		return;
 	}
 	HAL_TIM_Base_Start_IT(&htim4);
 	HAL_TIM_OC_Start_IT(&htim4, TIM_CHANNEL_1);
@@ -90,14 +97,16 @@ void TIM7_Init() {
 	htim7.Init.Period = 1000 - 1;
 	htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 	if (HAL_TIM_Base_Init(&htim7) != HAL_OK) {
-		Error_Handler();
+		Error_Handler(TIM7ErrorFunc_init, TIM7Error_baseInit);
+		return;
 	}
 
 	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
 	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
 	if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig)
 			!= HAL_OK) {
-		Error_Handler();
+		Error_Handler(TIM7ErrorFunc_init, TIM7Error_configSync);
+		return;
 	}
 
 	HAL_TIM_Base_Start_IT(&htim7);
@@ -112,7 +121,8 @@ void MX_TIM16_Init(void) {
 	htim16.Init.RepetitionCounter = 0;
 	htim16.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
 	if (HAL_TIM_Base_Init(&htim16) != HAL_OK) {
-		Error_Handler();
+		Error_Handler(TIM16ErrorFunc_init, TIM16Error_baseInit);
+		return;
 	}
 	HAL_TIM_Base_Start_IT(&htim16);
 }

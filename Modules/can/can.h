@@ -53,13 +53,6 @@ void CAN_testMessage(void);
  */
 void COM_RunUartAction(MessageTypeDef *message);
 
-/**
- * *******************************************************************************
- * @brief		:	Checks ID of message and pass to CAN1 or CAN2
- * *******************************************************************************
- */
-void CAN_transferTo(void);
-
 void CAN1_transfer(void);
 void CAN2_transfer(void);
 

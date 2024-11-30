@@ -15,6 +15,7 @@ typedef enum {
 	CAN1Error_init,
 	CAN1Error_configFilter,
 	CAN1Error_start,
+	CAN1Error_confPerifCLK,
 
 	CAN1Error_transferAddMessege,
 	CAN1Error_transferEnableTx,
@@ -25,6 +26,7 @@ typedef enum {
 	CAN2Error_init,
 	CAN2Error_configFilter,
 	CAN2Error_start,
+	CAN2Error_confPerifCLK,
 
 	CAN2Error_transferAddMessege,
 	CAN2Error_transferEnableTx,
@@ -32,6 +34,10 @@ typedef enum {
 	CAN2Error_fifoGetMessege,
 	CAN2Error_fifoActivateNotification,
 
+	COMError_watchdogInit,
+	COMError_BT,
+	COMError_ETH,
+	
     TIM4Error_baseInit,
     TIM4Error_configClock,
     TIM4Error_OCInit,
@@ -40,7 +46,6 @@ typedef enum {
     TIM7Error_baseInit,
     TIM7Error_configSync,
 	TIM16Error_baseInit,
-
 
 	SRCError_mainOscConfig,
 	SRCError_mainClockConfig,
@@ -51,8 +56,31 @@ typedef enum {
     HALError_UART1TX
 } Error_code;
 
+
+typedef enum {
+	CAN1ErrorFunc_init = 1,
+	CAN1ErrorFunc_transfer,
+	CAN1ErrorFunc_fifo,
+
+	CAN2ErrorFunc_init,
+	CAN2ErrorFunc_transfer,
+	CAN2ErrorFunc_fifo,
+	
+	COMErrorFunc_watchdogInit,
+	COMErrorFunc_BT,
+	COMErrorFunc_ETH,
+
+	TIM4ErrorFunc_init,
+	TIM7ErrorFunc_init,
+	TIM16ErrorFunc_init,
+
+	SRCErrorFunc_init,
+
+	HALErrorFunc_uartInit
+} Error_function;
+
 /* Functions ----------------------------------------------------------------- */
 
-void Error_Handler(Error_code error);
+void Error_Handler(Error_function error_func, Error_code error_code);
 
 #endif /* ERROR_HANDLERS_ERROR_HANDLERS_H_ */

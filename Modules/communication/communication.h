@@ -47,7 +47,7 @@ bool BT_Init();
  * @params info	:	Information to send (check frame documentation)
  * *******************************************************************************
  */
-bool BT_sendData(char *ID, char *info);
+bool BT_sendData(uint8_t *ID, uint8_t *info);
 
 /**
  * *******************************************************************************
