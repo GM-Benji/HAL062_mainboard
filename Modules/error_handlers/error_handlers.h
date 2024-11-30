@@ -9,6 +9,8 @@
 #ifndef ERROR_HANDLERS_ERROR_HANDLERS_H_
 #define ERROR_HANDLERS_ERROR_HANDLERS_H_
 
+#define MAINBOARD_ERROR_ID 69
+
 typedef enum {
 	CAN1Error_init,
 	CAN1Error_configFilter,
@@ -16,6 +18,7 @@ typedef enum {
 
 	CAN1Error_transferAddMessege,
 	CAN1Error_transferEnableTx,
+
 	CAN1Error_fifoGetMessege,
 	CAN1Error_fifoActivateNotification,
 
@@ -25,6 +28,7 @@ typedef enum {
 
 	CAN2Error_transferAddMessege,
 	CAN2Error_transferEnableTx,
+
 	CAN2Error_fifoGetMessege,
 	CAN2Error_fifoActivateNotification,
 
@@ -35,6 +39,8 @@ typedef enum {
     TIM4Error_configChannel,
     TIM7Error_baseInit,
     TIM7Error_configSync,
+	TIM16Error_baseInit,
+
 
 	SRCError_mainOscConfig,
 	SRCError_mainClockConfig,
@@ -44,8 +50,9 @@ typedef enum {
     HALError_UART1RX,
     HALError_UART1TX
 } Error_code;
+
 /* Functions ----------------------------------------------------------------- */
 
-void Error_Handler(void);
+void Error_Handler(Error_code error);
 
 #endif /* ERROR_HANDLERS_ERROR_HANDLERS_H_ */
