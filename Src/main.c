@@ -14,7 +14,6 @@
 #include "error_handlers/error_handlers.h"
 #include "timers/timers.h"
 #include "camera/camera.h"
-
 void SystemClock_Config(void);
 
 /**
@@ -46,7 +45,12 @@ int main(void) {
 	Camera_Init();
 	TIM4_Init();
 	/* Loop forever */
+	//Error_Handler(MAINEErrorFunc_test, MAINError_test);
+
 	while (1) {
+		Error_Handler(MAINEErrorFunc_test, MAINError_test);
+//		HAL_UART_Transmit(&tmp_btHuart, ethTxBuffer, 19, HAL_MAX_DELAY);
+//		HAL_UART_Transmit(&tmp_ethHuart, ethTxBuffer, 19, HAL_MAX_DELAY);
 	}
 }
 

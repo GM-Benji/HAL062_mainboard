@@ -9,9 +9,10 @@
 #ifndef ERROR_HANDLERS_ERROR_HANDLERS_H_
 #define ERROR_HANDLERS_ERROR_HANDLERS_H_
 
-#define MAINBOARD_ERROR_ID 69
+#define MAINBOARD_ERROR_ID 0x69
 
 typedef enum {
+	MAINError_test,
 	CAN1Error_init,
 	CAN1Error_configFilter,
 	CAN1Error_start,
@@ -58,7 +59,9 @@ typedef enum {
 
 
 typedef enum {
-	CAN1ErrorFunc_init = 1,
+	NO_ERROR,
+	MAINEErrorFunc_test,
+	CAN1ErrorFunc_init,
 	CAN1ErrorFunc_transfer,
 	CAN1ErrorFunc_fifo,
 

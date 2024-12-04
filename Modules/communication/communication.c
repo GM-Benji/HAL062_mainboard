@@ -123,36 +123,32 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
  * @details		: Initialization of USART3 with FIFO Queue
  * *******************************************************************************
  */
-bool BT_Init() {
-
+bool BT_Init(void) {
 	btHuart.Instance = USART3;
 	btHuart.Init.BaudRate = 115200;
 	btHuart.Init.WordLength = UART_WORDLENGTH_8B;
-	btHuart.Init.Parity = UART_PARITY_NONE;
 	btHuart.Init.StopBits = UART_STOPBITS_1;
+	btHuart.Init.Parity = UART_PARITY_NONE;
+	btHuart.Init.Mode = UART_MODE_TX_RX;
 	btHuart.Init.HwFlowCtl = UART_HWCONTROL_NONE;
 	btHuart.Init.OverSampling = UART_OVERSAMPLING_16;
-	btHuart.Init.Mode = UART_MODE_RX;
-
-	/* Peripheral clock enable */
-	__HAL_RCC_USART3_CLK_ENABLE();
-	__HAL_RCC_GPIOD_CLK_ENABLE();
-
-	btGpio.Pin = GPIO_PIN_8 | GPIO_PIN_9;
-	btGpio.Mode = GPIO_MODE_AF_PP;
-	btGpio.Pull = GPIO_NOPULL;
-	btGpio.Speed = GPIO_SPEED_FREQ_LOW;
-	btGpio.Alternate = GPIO_AF7_USART3;
-	HAL_GPIO_Init(GPIOD, &btGpio);
-
-	HAL_NVIC_SetPriority(USART3_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(USART3_IRQn);
-
-	HAL_UART_Init(&btHuart);
-
-	HAL_UARTEx_SetRxFifoThreshold(&btHuart, UART_RXFIFO_THRESHOLD_1_8);
-	HAL_UARTEx_SetTxFifoThreshold(&btHuart, UART_RXFIFO_THRESHOLD_1_8);
-	HAL_UARTEx_EnableFifoMode(&btHuart);
+	btHuart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+	btHuart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+	btHuart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+	if (HAL_UART_Init(&btHuart) != HAL_OK) {
+//		Error_Handler();
+	}
+	if (HAL_UARTEx_SetTxFifoThreshold(&btHuart, UART_TXFIFO_THRESHOLD_1_8)
+			!= HAL_OK) {
+//		Error_Handler();
+	}
+	if (HAL_UARTEx_SetRxFifoThreshold(&btHuart, UART_RXFIFO_THRESHOLD_1_8)
+			!= HAL_OK) {
+//		Error_Handler();
+	}
+	if (HAL_UARTEx_DisableFifoMode(&btHuart) != HAL_OK) {
+//		Error_Handler();
+	}
 
 	return 0;
 }
@@ -234,7 +230,7 @@ bool Eth_sendData(uint8_t *ID, uint8_t *info) {
 	for (uint8_t i = 0; i < 16; i++)
 		ethTxBuffer[i + 3] = info[i];
 
-	if (HAL_UART_Transmit_DMA(&ethHuart, ethTxBuffer, 19) == HAL_OK) {
+	if (HAL_UART_Transmit(&ethHuart, ethTxBuffer, 19, 1000) == HAL_OK) {
 		return 0;
 	}
 	return 1;
@@ -260,7 +256,7 @@ bool BT_sendData(uint8_t *ID, uint8_t *info) {
 	for (uint8_t i = 0; i < 16; i++)
 		btTxBuffer[i + 3] = info[i];
 
-	if (HAL_UART_Transmit_IT(&btHuart, btTxBuffer, 19) == HAL_OK) {
+	if (HAL_UART_Transmit(&btHuart, btTxBuffer, 19, 1000) == HAL_OK) {
 		return 0;
 	}
 	return 1;
@@ -360,22 +356,20 @@ void UART_Decode(uint8_t *rawMessage) {
  * *******************************************************************************
  */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
-	
+
 	if (huart->Instance == btHuart.Instance) {
 		Error_Handler(COMErrorFunc_BT, COMError_BT);
 		return;
 	}
 
-	if (huart->Instance == ethHuart.Instance) {
-		Error_Handler(COMErrorFunc_ETH, COMError_ETH);
-		return;
-	} 
-
+//	if (huart->Instance == ethHuart.Instance) {
+//		Error_Handler(COMErrorFunc_ETH, COMError_ETH);
+//		return;
+//	}
 
 	err_counter++;
 
 }
-
 
 void UART_encode(uint8_t value, uint8_t *hex) {
 	const uint8_t hex_digits[16] = { '0', '1', '2', '3', '4', '5', '6', '7',

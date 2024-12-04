@@ -19,15 +19,15 @@
 
 uint8_t error_count = 0;
 bool error_active = 0; 
-Error_function current_error;
+Error_function current_error = NO_ERROR;
 
-static uint8_t error_id[2] = { 0 };
-static uint8_t error_data[16] = {[2 ... 15] = 'X'};
+uint8_t error_id[2] = { 0, 0 };
+uint8_t error_data[16] = {[2 ... 15] = 'X'};
 
 /* Functions ------------------------------------------------------------------- */
 
 static void encode_err(Error_code error) {
-	UART_encode(MAINBOARD_ERROR_ID, error_id);
+	UART_encode((uint8_t) MAINBOARD_ERROR_ID, error_id);
 	UART_encode((uint8_t) error, error_data);
 }
 
@@ -40,33 +40,40 @@ static void encode_err(Error_code error) {
  ******************************************************************************
  */
 void Error_Handler(Error_function error_func, Error_code error_code) {
-	__disable_irq();
+	//__disable_irq();
 	error_active = 1;
-	
-	if (error_count > 3) {
-		while (1) {}
-	}
+
+//	if (error_count > 3) {
+//		while (1) {}
+//	}
+
+	encode_err(error_code);
+	BT_sendData(error_id, error_data);
+
+	if (error_func != COMErrorFunc_BT)
+		BT_sendData(error_id, error_data);
+
+	if (error_func != COMErrorFunc_ETH)
+		Eth_sendData(error_id, error_data);
 
 	if (current_error == error_func) {
 		error_count++;
 		return;
 	}
 	
-	if (current_error != 0) {
+	if (current_error != NO_ERROR) {
 		// we have two different errors
 		while (1) {}
 	}
 
 	current_error = error_func;
-	encode_err(error_code);
 
-	if (error_func != COMErrorFunc_BT) 
-		BT_sendData(error_id, error_data);
 
-	if (error_func != COMErrorFunc_ETH)
-		Eth_sendData(error_id, error_data);
 
 	switch (error_func) {
+	case MAINEErrorFunc_test:
+		error_active = 0;
+		break;
 	case CAN1ErrorFunc_init:
 		while (error_active) {
 			error_active = 0;
@@ -152,9 +159,9 @@ void Error_Handler(Error_function error_func, Error_code error_code) {
 		while (1) {}
 	}
 	error_count	= 0;
-	error_func = 0; 
+	current_error = NO_ERROR;
 
-	__enable_irq();
+	//__enable_irq();
 
 
 	/// TODO: FInish Error handler!
