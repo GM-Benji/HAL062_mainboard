@@ -17,9 +17,6 @@
 #include "lamp/lamp.h"
 #include "error_handlers/error_handlers.h"
 
-static GPIO_InitTypeDef ethGpio;
-static GPIO_InitTypeDef btGpio;
-
 static uint32_t err_counter = 0;
 extern MessageTypeDef UART_MessageRecieved; // struct from can.h representing message
 
@@ -183,8 +180,6 @@ bool Eth_Init() {
 	ethHuart.Init.OverSampling = UART_OVERSAMPLING_16;
 	ethHuart.Init.Mode = UART_MODE_TX_RX;
 
-//	HAL_GPIO_Init(GPIOA, &ethGpio);
-
 	HAL_UART_Init(&ethHuart);
 	HAL_UARTEx_SetRxFifoThreshold(&ethHuart, UART_RXFIFO_THRESHOLD_1_8);
 	HAL_UARTEx_SetTxFifoThreshold(&ethHuart, UART_RXFIFO_THRESHOLD_1_8);
@@ -205,7 +200,7 @@ void Watchdog_Init(void) {
 	hiwdg1.Init.Window = 4095;
 	hiwdg1.Init.Reload = 4095;
 	if (HAL_IWDG_Init(&hiwdg1) != HAL_OK) {
-		Error_Handler(COMError_watchdogInit, COMError_watchdogInit);
+		Error_Handler(COMErrorFunc_watchdogInit, COMError_watchdogInit);
 		return;
 	}
 }
@@ -352,20 +347,20 @@ void UART_Decode(uint8_t *rawMessage) {
 
 /**
  * *******************************************************************************
- * @brief		:	Counting UART_Error. TODO Handling errors.
- * *******************************************************************************
+ * @brief		:	Counting UART_Error.  
+ *********************************************************************************
  */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
 
 	if (huart->Instance == btHuart.Instance) {
-		Error_Handler(COMErrorFunc_BT, COMError_BT);
+		Error_Handler(COMErrorFunc_Bt, COMError_Bt);
 		return;
 	}
 
-//	if (huart->Instance == ethHuart.Instance) {
-//		Error_Handler(COMErrorFunc_ETH, COMError_ETH);
-//		return;
-//	}
+	if (huart->Instance == ethHuart.Instance) {
+		Error_Handler(COMErrorFunc_Eth, COMError_Eth);
+		return;
+	}
 
 	err_counter++;
 

@@ -36,31 +36,33 @@ typedef enum {
 	CAN2Error_fifoActivateNotification,
 
 	COMError_watchdogInit,
-	COMError_BT,
-	COMError_ETH,
-	
-    TIM4Error_baseInit,
-    TIM4Error_configClock,
-    TIM4Error_OCInit,
-    TIM4Error_configSync,
-    TIM4Error_configChannel,
-    TIM7Error_baseInit,
-    TIM7Error_configSync,
+
+	COMError_Bt,
+	COMError_BtPeriphClock,
+
+	COMError_Eth,
+	COMError_EthPeriphClock,
+	COMError_EthRX,
+	COMError_EthTX,
+
+	TIM4Error_baseInit,
+	TIM4Error_configClock,
+	TIM4Error_OCInit,
+	TIM4Error_configSync,
+	TIM4Error_configChannel,
+	TIM7Error_baseInit,
+	TIM7Error_configSync,
 	TIM16Error_baseInit,
 
 	SRCError_mainOscConfig,
 	SRCError_mainClockConfig,
-    HALError_CAN1,
-    HALError_CAN2,
-    HALError_UART1PeriphClock,
-    HALError_UART1RX,
-    HALError_UART1TX
+	HALError_CAN1,
+	HALError_CAN2,
+
 } Error_code;
 
-
 typedef enum {
-	NO_ERROR,
-	MAINEErrorFunc_test,
+	MAINEErrorFunc_test = 1,
 	CAN1ErrorFunc_init,
 	CAN1ErrorFunc_transfer,
 	CAN1ErrorFunc_fifo,
@@ -68,22 +70,44 @@ typedef enum {
 	CAN2ErrorFunc_init,
 	CAN2ErrorFunc_transfer,
 	CAN2ErrorFunc_fifo,
-	
+
 	COMErrorFunc_watchdogInit,
-	COMErrorFunc_BT,
-	COMErrorFunc_ETH,
+	COMErrorFunc_BtInit,
+	COMErrorFunc_EthInit,
+	COMErrorFunc_Bt,
+	COMErrorFunc_Eth,
 
 	TIM4ErrorFunc_init,
 	TIM7ErrorFunc_init,
 	TIM16ErrorFunc_init,
 
 	SRCErrorFunc_init,
-
-	HALErrorFunc_uartInit
 } Error_function;
 
 /* Functions ----------------------------------------------------------------- */
 
+/** 
+ ****************************************************************************** 
+ * Function to handle the errors that may occur during the runtime 
+ * tries to restore the functional state of the program, most often by redoing 
+ * some initialization steps
+ *
+ * The error handling logic is located in the switch-case construction, 
+ * each value of Error_function enum corresponds its own case.
+ *
+ * USAGE:
+ *    Error_Handler(Error_function, Error_code);
+ *    return; 
+ *
+ * It is IMPORTANT to return from function after calling Error_Handler,
+ * failure to do so will lead to unexpected behavior.
+ *
+ * @param error_func  solely responsible for the behavior of the error_handler 
+ * Does Not influence the error code sent outside via coms 
+ * @param error_code  solely responsible for the error code sent outside
+ * Does Not influence the behavior of error handling  
+ ****************************************************************************** 
+ */
 void Error_Handler(Error_function error_func, Error_code error_code);
 
 #endif /* ERROR_HANDLERS_ERROR_HANDLERS_H_ */

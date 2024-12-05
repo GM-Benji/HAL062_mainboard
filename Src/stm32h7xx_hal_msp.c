@@ -197,17 +197,13 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart) {
 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 	RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = { 0 };
 	if (huart->Instance == USART1) {
-		/* USER CODE BEGIN USART1_MspInit 0 */
-
-		/* USER CODE END USART1_MspInit 0 */
-
 		/** Initializes the peripherals clock
 		 */
 		PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART1;
 		PeriphClkInitStruct.Usart16ClockSelection =
 		RCC_USART16CLKSOURCE_D2PCLK2;
 		if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
-			Error_Handler(HALErrorFunc_uartInit, HALError_UART1PeriphClock);
+			Error_Handler(COMErrorFunc_EthInit, COMError_EthPeriphClock);
 			return;
 		}
 
@@ -242,7 +238,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart) {
 		hdma_usart1_rx.Init.MemBurst = DMA_MBURST_SINGLE;
 		hdma_usart1_rx.Init.PeriphBurst = DMA_PBURST_SINGLE;
 		if (HAL_DMA_Init(&hdma_usart1_rx) != HAL_OK) {
-			Error_Handler(HALErrorFunc_uartInit, HALError_UART1RX);
+			Error_Handler(COMErrorFunc_EthInit, COMError_EthRX);
 			return;
 		}
 
@@ -260,29 +256,22 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart) {
 		hdma_usart1_tx.Init.Priority = DMA_PRIORITY_LOW;
 		hdma_usart1_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
 		if (HAL_DMA_Init(&hdma_usart1_tx) != HAL_OK) {
-			Error_Handler(HALErrorFunc_uartInit, HALError_UART1TX);
+			Error_Handler(COMErrorFunc_EthInit, COMError_EthTX);
 			return;
 		}
 
 		__HAL_LINKDMA(huart, hdmatx, hdma_usart1_tx);
-
-		/* USER CODE BEGIN USART1_MspInit 1 */
-
-		/* USER CODE END USART1_MspInit 1 */
 	}
 
 	if (huart->Instance == USART3) {
-		/* USER CODE BEGIN USART3_MspInit 0 */
-
-		/* USER CODE END USART3_MspInit 0 */
-
 		/** Initializes the peripherals clock
 		 */
 		PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART3;
 		PeriphClkInitStruct.Usart234578ClockSelection =
 		RCC_USART234578CLKSOURCE_D2PCLK1;
 		if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
-//			Error_Handler();
+			Error_Handler(COMErrorFunc_BtInit, COMError_BtPeriphClock);
+			return;
 		}
 
 		/* Peripheral clock enable */
@@ -299,7 +288,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart) {
 		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 		GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
 		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
 	}
 }
 
