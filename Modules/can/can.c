@@ -213,12 +213,12 @@ void COM_RunUartAction(MessageTypeDef *message) {
 	UART_MessageRecieved.lenght = message->lenght;
 
 	if (UART_MessageRecieved.ID > 0 && UART_MessageRecieved.ID <= 127) {
-		CAN1_transfer();
+		CAN2_transfer();
 		return;
 	}
 
 	if (UART_MessageRecieved.ID >= 128) {
-		CAN2_transfer();
+		CAN1_transfer();
 		return;
 	}
 }
@@ -387,6 +387,9 @@ void CAN2_processFifo0(uint32_t RxFifo0ITs) {
 			send[2 * i + 1] = hex[1];
 		}
 		Eth_sendData(ID, send);
+
+	case 68:
+		can_error_to_uart(RxMsg, RxHeader.Identifier);
 	}
 
 	if (HAL_FDCAN_ActivateNotification(&hfdcan2,

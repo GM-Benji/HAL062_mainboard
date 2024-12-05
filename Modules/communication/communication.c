@@ -225,7 +225,7 @@ bool Eth_sendData(uint8_t *ID, uint8_t *info) {
 	for (uint8_t i = 0; i < 16; i++)
 		ethTxBuffer[i + 3] = info[i];
 
-	if (HAL_UART_Transmit(&ethHuart, ethTxBuffer, 19, 1000) == HAL_OK) {
+	if (HAL_UART_Transmit(&ethHuart, ethTxBuffer, 19, 50) == HAL_OK) {
 		return 0;
 	}
 	return 1;
@@ -251,7 +251,7 @@ bool BT_sendData(uint8_t *ID, uint8_t *info) {
 	for (uint8_t i = 0; i < 16; i++)
 		btTxBuffer[i + 3] = info[i];
 
-	if (HAL_UART_Transmit(&btHuart, btTxBuffer, 19, 1000) == HAL_OK) {
+	if (HAL_UART_Transmit(&btHuart, btTxBuffer, 19, 50) == HAL_OK) {
 		return 0;
 	}
 	return 1;
@@ -361,9 +361,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
 		Error_Handler(COMErrorFunc_Eth, COMError_Eth);
 		return;
 	}
-
 	err_counter++;
-
 }
 
 void UART_encode(uint8_t value, uint8_t *hex) {

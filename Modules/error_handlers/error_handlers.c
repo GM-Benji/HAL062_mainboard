@@ -26,23 +26,18 @@ uint8_t error_uart_data[16] = { [2 ... 15] = 'X' };
 
 /* Functions ------------------------------------------------------------------- */
 
+void can_error_to_uart(uint8_t *message, uint8_t ID) {
+	UART_encode((uint8_t) ID, error_uart_id);
+	UART_encode((uint8_t) message[0], error_uart_data);
+
+	BT_sendData(error_uart_id, error_uart_data);
+	Eth_sendData(error_uart_id, error_uart_data);
+}
+
+
 static void encode_err(Error_code error) {
 	UART_encode((uint8_t) MAINBOARD_ERROR_ID, error_uart_id);
 	UART_encode((uint8_t) error, error_uart_data);
-}
-
-// TODO how do we handle ids on can
-static void send_err_can2(Error_code error) {
-	return;
-	MessageTypeDef message;
-
-	message.ID = MAINBOARD_ERROR_ID;
-	message.data[0] = MAINBOARD_ERROR_ID;
-	message.data[1] = error;
-	// TODO prove message.data does not contain garbage data
-	message.lenght = 8;
-
-	COM_RunUartAction(&message);
 }
 
 /**
@@ -78,10 +73,6 @@ void Error_Handler(Error_function error_func, Error_code error_code) {
 
 	if (error_func != COMErrorFunc_Eth)
 		Eth_sendData(error_uart_id, error_uart_data);
-
-	if (error_func != CAN2ErrorFunc_init
-			&& error_func != CAN2ErrorFunc_transfer)
-		send_err_can2(error_code);
 
 	switch (error_func) {
 	case MAINEErrorFunc_test:

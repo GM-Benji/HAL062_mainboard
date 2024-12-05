@@ -103,11 +103,14 @@ typedef enum {
  * failure to do so will lead to unexpected behavior.
  *
  * @param error_func  solely responsible for the behavior of the error_handler 
- * Does Not influence the error code sent outside via coms 
+ * Does Not influence the error code sent outside via coms
+ *
  * @param error_code  solely responsible for the error code sent outside
  * Does Not influence the behavior of error handling  
  ****************************************************************************** 
  */
 void Error_Handler(Error_function error_func, Error_code error_code);
+
+void can_error_to_uart(uint8_t *message, uint8_t ID);
 
 #endif /* ERROR_HANDLERS_ERROR_HANDLERS_H_ */
