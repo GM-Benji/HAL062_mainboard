@@ -56,8 +56,8 @@ void COM_RunUartAction(MessageTypeDef *message);
 void CAN1_transfer(void);
 void CAN2_transfer(void);
 
-void CAN1_processFifo0(uint32_t RxFifo0ITs);
-void CAN2_processFifo0(uint32_t RxFifo0ITs);
+void CAN1_processFifo0();
+void CAN2_processFifo0();
 
 
 #endif /* MODULES_CAN_CAN_H_ */

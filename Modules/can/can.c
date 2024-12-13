@@ -321,7 +321,7 @@ void CAN2_transfer(void) {
 	Leds_toggle(LED_4);
 }
 
-void CAN1_processFifo0(uint32_t RxFifo0ITs) {
+void CAN1_processFifo0() {
 
 	if (HAL_FDCAN_GetRxMessage(&hfdcan1, FDCAN_RX_FIFO0, &RxHeader, RxMsg)
 			!= HAL_OK) {
@@ -352,6 +352,10 @@ void CAN1_processFifo0(uint32_t RxFifo0ITs) {
 	case 158 ... 163:
 		angles[RxHeader.Identifier - 158].ui = RxMsg[3] | (RxMsg[2] << 8)
 				| (RxMsg[1] << 16) | (RxMsg[0] << 24);
+		break;
+
+	default:
+		break;
 	}
 
 	if (HAL_FDCAN_ActivateNotification(&hfdcan1,
@@ -362,7 +366,7 @@ void CAN1_processFifo0(uint32_t RxFifo0ITs) {
 	}
 }
 
-void CAN2_processFifo0(uint32_t RxFifo0ITs) {
+void CAN2_processFifo0() {
 	if (HAL_FDCAN_GetRxMessage(&hfdcan2, FDCAN_RX_FIFO0, &RxHeader, RxMsg)
 			!= HAL_OK) {
 		/* Reception Error */
@@ -374,22 +378,19 @@ void CAN2_processFifo0(uint32_t RxFifo0ITs) {
 	case 24 ... 29:
 		speeds[RxHeader.Identifier - 24].ui = RxMsg[3] | (RxMsg[2] << 8)
 				| (RxMsg[1] << 16) | (RxMsg[0] << 24);
+		break;
 
 	case 60:
-		;
-		static uint8_t ID[2] = { 0 };
-		static uint8_t send[16] = { 0 };
-		static uint8_t hex[2] = { 0 };
-		UART_encode((uint8_t) RxHeader.Identifier, ID);
-		for (uint8_t i = 0; i < 4; i++) {
-			UART_encode(RxMsg[i], hex);
-			send[2 * i] = hex[0];
-			send[2 * i + 1] = hex[1];
-		}
-		Eth_sendData(ID, send);
+		Eth_sendData((uint8_t) RxHeader.Identifier, RxMsg, 4);
+		break;
 
-	case 68:
-		can_error_to_uart(RxMsg, RxHeader.Identifier);
+	case 68: // test error
+		Eth_sendData((uint8_t) RxHeader.Identifier, RxMsg, 1);
+		BT_sendData((uint8_t) RxHeader.Identifier, RxMsg, 1);
+		break;
+
+	default:
+		break;
 	}
 
 	if (HAL_FDCAN_ActivateNotification(&hfdcan2,
@@ -406,12 +407,12 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 		return;
 
 	if (hfdcan->Instance == FDCAN1) {
-		CAN1_processFifo0(RxFifo0ITs);
+		CAN1_processFifo0();
 		return;
 	}
 
 	if (hfdcan->Instance == FDCAN2) {
-		CAN2_processFifo0(RxFifo0ITs);
+		CAN2_processFifo0();
 		return;
 	}
 }

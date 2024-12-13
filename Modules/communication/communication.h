@@ -42,21 +42,21 @@ bool BT_Init();
 
 /**
  * *******************************************************************************
- * @brief		:	Sending data threw bluetooth
- * @params ID	:	ID of data (check frame documentation)
- * @params info	:	Information to send (check frame documentation)
+ * @brief		:	Sending data throgh bluetooth
+ * @params ID	:	ID of data 
+ * @params info	:	Information to send
  * *******************************************************************************
  */
-bool BT_sendData(uint8_t *ID, uint8_t *info);
+void BT_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length);
 
 /**
  * *******************************************************************************
- * @brief		:	Sending data threw ethernet
- * @params ID	:	ID of data (check frame documentation)
- * @params info	:	Information to send (check frame documentation)
+ * @brief		:	Sending data throgh ethernet
+ * @params ID	:	ID of data 
+ * @params info	:	Information to send 
  * *******************************************************************************
  */
-bool Eth_sendData(uint8_t *ID, uint8_t *info);
+void Eth_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length);
 
 /**
  * *******************************************************************************
@@ -86,7 +86,5 @@ bool BT_ReceiveData();
  * *******************************************************************************
  */
 void Watchdog_Init(void);
-
-void UART_encode(uint8_t value, uint8_t *hex);
 
 #endif // MODULE_COMMUNICATION_COMMUNICATION_H

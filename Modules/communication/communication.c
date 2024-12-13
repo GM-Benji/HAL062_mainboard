@@ -35,6 +35,11 @@ DMA_HandleTypeDef hdma_usart1_tx;
 
 struct commands uartCommands;
 
+static void encode_list_KNR(uint8_t *data, uint8_t *encoded,
+		uint8_t data_length);
+static uint8_t decode_list_KNR(uint8_t *encoded, uint8_t *data,
+		uint8_t data_length);
+
 /**
  * *******************************************************************************
  * @brief	:	Overwritten callback after receiving message
@@ -215,20 +220,15 @@ void Watchdog_Init(void) {
  * @see			:	UART frame documentation
  * *******************************************************************************
  */
-bool Eth_sendData(uint8_t *ID, uint8_t *info) {
+void Eth_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length) {
+	uint8_t TxBuffer[19] = { [0] = '#', [1 ... 18] = 'X' };
 
-	uint8_t ethTxBuffer[19];
-	ethTxBuffer[0] = '#';
-	for (uint8_t i = 0; i < 2; i++)
-		ethTxBuffer[i + 1] = ID[i];
+	encode_list_KNR(&ID, TxBuffer + 1, 1);
+	encode_list_KNR(data, TxBuffer + 3, data_length);
 
-	for (uint8_t i = 0; i < 16; i++)
-		ethTxBuffer[i + 3] = info[i];
-
-	if (HAL_UART_Transmit(&ethHuart, ethTxBuffer, 19, 50) == HAL_OK) {
-		return 0;
+	if (HAL_UART_Transmit(&btHuart, TxBuffer, 19, 50) != HAL_OK) {
+		// mb add error handler here	
 	}
-	return 1;
 }
 
 /**
@@ -241,20 +241,16 @@ bool Eth_sendData(uint8_t *ID, uint8_t *info) {
  * @see			:	UART frame documentation
  * *******************************************************************************
  */
-bool BT_sendData(uint8_t *ID, uint8_t *info) {
+void BT_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length) {
+	uint8_t TxBuffer[19] = { [0] = '#', [1 ... 18] = 'X' };
 
-	uint8_t btTxBuffer[19];
-	btTxBuffer[0] = '#';
-	for (uint8_t i = 0; i < 2; i++)
-		btTxBuffer[i + 1] = ID[i];
 
-	for (uint8_t i = 0; i < 16; i++)
-		btTxBuffer[i + 3] = info[i];
+	encode_list_KNR(&ID, TxBuffer + 1, 1);
+	encode_list_KNR(data, TxBuffer + 3, data_length);
 
-	if (HAL_UART_Transmit(&btHuart, btTxBuffer, 19, 50) == HAL_OK) {
-		return 0;
+	if (HAL_UART_Transmit(&btHuart, TxBuffer, 19, 50) != HAL_OK) {
+		// mb add error handler here	
 	}
-	return 1;
 }
 
 /**
@@ -289,6 +285,7 @@ bool Eth_ReceiveData() {
  */
 void UART_Decode(uint8_t *rawMessage) {
 
+	// WTH does this do
 	if (rawMessage[0] != '#' && searching != 2) {
 		searching = 1;
 		return;
@@ -307,42 +304,11 @@ void UART_Decode(uint8_t *rawMessage) {
 	}
 
 	/*Zamiana hex w ACSII na liczbe*/
-	if (rawMessage[0] == '#') {
-		if (rawMessage[1] >= 65)
-			UART_MessageRecieved.ID += (rawMessage[1] - 55) * 0x10;
-		else
-			UART_MessageRecieved.ID += (rawMessage[1] - 48) * 0x10;
 
-		if (rawMessage[2] >= 65)
-			UART_MessageRecieved.ID += (rawMessage[2] - 55);
-		else
-			UART_MessageRecieved.ID += (rawMessage[2] - 48);
+	decode_list_KNR(rawMessage + 1, &UART_MessageRecieved.ID, 1);
 
-		uint8_t i = 3;
-		uint8_t index = 0;
-		while (i < 19 && rawMessage[i] != 88)
-		//x - end of transmission
-		{
-			UART_MessageRecieved.data[index] = 0;
-			if (rawMessage[i] >= 65)
-				UART_MessageRecieved.data[index] += (rawMessage[i] - 55) * 0x10;
-			else
-				UART_MessageRecieved.data[index] += (rawMessage[i] - 48) * 0x10;
-			i++;
-			if (rawMessage[i] >= 65)
-				UART_MessageRecieved.data[index] += (rawMessage[i] - 55);
-			else
-				UART_MessageRecieved.data[index] += (rawMessage[i] - 48);
-			i++;
-			index++;
-		}
-		for (uint8_t j = index; j < 8; j++) {
-			UART_MessageRecieved.data[j] = 'X';
-		}
-		UART_MessageRecieved.lenght = index;
-
-	}
-
+	UART_MessageRecieved.lenght = decode_list_KNR(rawMessage + 3,
+			UART_MessageRecieved.data, 8);
 }
 
 /**
@@ -364,10 +330,51 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
 	err_counter++;
 }
 
-void UART_encode(uint8_t value, uint8_t *hex) {
-	const uint8_t hex_digits[16] = { '0', '1', '2', '3', '4', '5', '6', '7',
+static void encode_list_KNR(uint8_t *data, uint8_t *encoded,
+		uint8_t data_length) {
+	const uint8_t HEX_DIGITS[16] = { '0', '1', '2', '3', '4', '5', '6', '7',
 			'8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
-	hex[0] = hex_digits[(value >> 4) & 0x0F];  // High nibble
-	hex[1] = hex_digits[value & 0x0F];         // Low nibble
+	for (uint8_t i = 0; i < data_length; i++) {
+		encoded[i * 2] = HEX_DIGITS[(data[i] >> 4)];
+		encoded[i * 2 + 1] = HEX_DIGITS[(data[i] & 0x0F)];
+	}
+}
+
+static uint8_t decode_list_KNR(uint8_t *encoded, uint8_t *data,
+		uint8_t data_length) {
+	for (uint8_t i = 0; i < data_length; i++) {
+
+		// decode first 4 bytes
+		switch (encoded[i * 2]) {
+		case '0' ... '9':
+			data[i] = (encoded[i * 2] - 0x30) << 4;
+			continue;
+
+		case 'A' ... 'F':
+			data[i] = (encoded[i * 2] - 0x37) << 4;
+			continue;
+
+		case 'Z': // end of message
+			return i;
+
+		default:
+			return 0;
+		}
+
+		// decode last 4 bytes
+		switch (encoded[i * 2 + 1]) {
+		case '0' ... '9':
+			data[i] = (encoded[i * 2 + 1] - 0x30) << 4;
+			continue;
+
+		case 'A' ... 'F':
+			data[i] = (encoded[i * 2 + 1] - 0x37) << 4;
+			continue;
+
+		default:
+			return 0;
+		}
+	}
+	return data_length;
 }

@@ -21,24 +21,8 @@ uint8_t ERROR_COUNT = 0;
 bool ERROR_ACTIVE = 0;
 uint8_t ERROR_CURRENT = 0;
 
-uint8_t error_uart_id[2] = { 0, 0 };
-uint8_t error_uart_data[16] = { [2 ... 15] = 'X' };
-
 /* Functions ------------------------------------------------------------------- */
 
-void can_error_to_uart(uint8_t *message, uint8_t ID) {
-	UART_encode((uint8_t) ID, error_uart_id);
-	UART_encode((uint8_t) message[0], error_uart_data);
-
-	BT_sendData(error_uart_id, error_uart_data);
-	Eth_sendData(error_uart_id, error_uart_data);
-}
-
-
-static void encode_err(Error_code error) {
-	UART_encode((uint8_t) MAINBOARD_ERROR_ID, error_uart_id);
-	UART_encode((uint8_t) error, error_uart_data);
-}
 
 /**
  * @see  documentation in the header file (error_handlers.h)
@@ -66,13 +50,11 @@ void Error_Handler(Error_function error_func, Error_code error_code) {
 
 	ERROR_CURRENT = error_func;
 
-	encode_err(error_code);
-
 	if (error_func != COMErrorFunc_Bt)
-		BT_sendData(error_uart_id, error_uart_data);
+		BT_sendData((uint8_t) MAINBOARD_ERROR_ID, (uint8_t*) error_code, 1);
 
 	if (error_func != COMErrorFunc_Eth)
-		Eth_sendData(error_uart_id, error_uart_data);
+		Eth_sendData((uint8_t) MAINBOARD_ERROR_ID, (uint8_t*) error_code, 1);
 
 	switch (error_func) {
 	case MAINEErrorFunc_test:
@@ -162,6 +144,9 @@ void Error_Handler(Error_function error_func, Error_code error_code) {
 		break;
 
 	case SRCErrorFunc_init:
+		break;
+
+	default:
 		break;
 	}
 

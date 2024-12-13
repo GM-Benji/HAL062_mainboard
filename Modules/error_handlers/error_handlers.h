@@ -111,6 +111,6 @@ typedef enum {
  */
 void Error_Handler(Error_function error_func, Error_code error_code);
 
-void can_error_to_uart(uint8_t *message, uint8_t ID);
+// void can_error_to_uart(uint8_t *message, uint8_t ID);
 
 #endif /* ERROR_HANDLERS_ERROR_HANDLERS_H_ */
