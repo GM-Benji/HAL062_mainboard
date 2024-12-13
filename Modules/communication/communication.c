@@ -244,7 +244,6 @@ void Eth_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length) {
 void BT_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length) {
 	uint8_t TxBuffer[19] = { [0] = '#', [1 ... 18] = 'X' };
 
-
 	encode_list_KNR(&ID, TxBuffer + 1, 1);
 	encode_list_KNR(data, TxBuffer + 3, data_length);
 
