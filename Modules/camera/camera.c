@@ -3,7 +3,7 @@
 
 int cam_bridge[3] = { 0, 0, 0 };
 
-void Camera_Init(void) {
+void Cam_Init(void) {
 
 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
@@ -25,16 +25,15 @@ void Camera_Init(void) {
 void Cam_handle(uint8_t *data) {
 	// Sprawdzenie czy dane spełniają warunki i włączenie odpowiedniej kamery
 
-	// why don't we throw an error?
-	if ((3 >= data[0]) && (data[0] >= 1)) {
-		cam_bridge[0] = data[0] - 1;
-	}
+	for (uint8_t i=0; i<3; i++) {
+		switch(data[i]){
 
-	if ((3 >= data[1]) && (data[1] >= 1)) {
-		cam_bridge[1] = data[1] - 1;
-	}
+		case 1 ... 3:
+			cam_bridge[i] = data[i]-1;
+			break;
 
-	if ((3 >= data[2]) && (data[2] >= 1)) {
-		cam_bridge[2] = data[2] - 1;
+		default:
+			break;
+		}
 	}
 }

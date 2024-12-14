@@ -46,33 +46,35 @@ static uint8_t decode_list_KNR(uint8_t *encoded, uint8_t *data,
  * *******************************************************************************
  */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+	
+	// take advantage of both UART coms transfering the same information 
+	HAL_IWDG_Refresh(&hiwdg1);
+	UART_Decode(UART_ReceivedRaw);
+
+	switch (UART_MessageRecieved.ID) {
+	case 10:
+		Lamp_handle(UART_MessageRecieved.data);
+		Lamp_setMaxValue(UART_MessageRecieved.data);
+		break;
+
+	case 45:
+		Cam_handle(UART_MessageRecieved.data);
+		break;
+
+	default:
+		COM_RunUartAction(&UART_MessageRecieved);
+		break;
+	}
+
 	if (huart->Instance == USART1) {
-		HAL_IWDG_Refresh(&hiwdg1);
-		UART_Decode(UART_ReceivedRaw);
-		if (UART_MessageRecieved.ID == 45) {
-			Cam_handle(UART_MessageRecieved.data);
-		} else if (UART_MessageRecieved.ID == 10) {
-			Lamp_handle(UART_MessageRecieved.data);
-			Lamp_setMaxValue(UART_MessageRecieved.data);
-		} else {
-			COM_RunUartAction(&UART_MessageRecieved);
-		}
+		// Handle Eth overwrite 
 		UART_MessageRecieved.ID = 0;
 		memset(&UART_MessageRecieved.data, 0x0u, 8);
 		HAL_UART_Receive_DMA(&ethHuart, UART_ReceivedRaw, 19);
 		return;
 
 	} else if (huart->Instance == USART3) {
-		HAL_IWDG_Refresh(&hiwdg1);
-		UART_Decode(UART_ReceivedRaw);
-		if (UART_MessageRecieved.ID == 45) {
-			Cam_handle(UART_MessageRecieved.data);
-		} else if (UART_MessageRecieved.ID == 10) {
-			Lamp_handle(UART_MessageRecieved.data);
-			Lamp_setMaxValue(UART_MessageRecieved.data);
-		} else {
-			COM_RunUartAction(&UART_MessageRecieved);
-		}
+		// Handle BT overwrite
 		UART_MessageRecieved.ID = 0;
 		memset(&UART_MessageRecieved.data, 0x0u, 8);
 		HAL_UART_Receive_IT(&btHuart, UART_ReceivedRaw, 19);
@@ -80,7 +82,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 	}
 }
-
+// Isnt this important?
+//
 //	if (huart->Instance == USART1) {
 //		UART_Decode(UART_ReceivedRaw);
 //		if (searching == 0) {
@@ -148,7 +151,9 @@ bool BT_Init(void) {
 			!= HAL_OK) {
 //		Error_Handler();
 	}
-	if (HAL_UARTEx_DisableFifoMode(&btHuart) != HAL_OK) {
+
+	// Most likely the error is here, this doesnt line up with NEW_ERA
+	if (HAL_UARTEx_DisableFifoMode(&btHuart) != HAL_OK) { 	
 //		Error_Handler();
 	}
 

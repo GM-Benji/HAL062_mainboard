@@ -329,25 +329,6 @@ void CAN1_processFifo0() {
 		Error_Handler(CAN1ErrorFunc_fifo, CAN1Error_fifoGetMessege);
 		return;
 	}
-
-	// some legacy code 
-	//			uint8_t ID[2];
-	//			uint8_t send[16];
-	//			uint8_t hex[2];
-	//			UART_encode((uint8_t)RxHeader.Identifier, ID);
-	//			for(uint8_t i = 0; i<4;i++)
-	//			{
-	//
-	//				UART_encode(RxMsg[i], hex);
-	//				send[2*i] = hex[0];
-	//				send[2*i+1] = hex[1];
-	//			}
-	////			for(uint8_t i = 0; i<(16-RxHeader.DataLength*2);i++)
-	////			{
-	////				send[i+RxHeader.DataLength*2] = 'x';
-	////			}
-	//			Eth_sendData(ID, send);
-
 	switch (RxHeader.Identifier) {
 	case 158 ... 163:
 		angles[RxHeader.Identifier - 158].ui = RxMsg[3] | (RxMsg[2] << 8)

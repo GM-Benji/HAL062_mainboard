@@ -42,7 +42,7 @@ int main(void) {
 
 	Watchdog_Init(); //< Starting watchdog to prevent communication lost
 
-	Camera_Init();
+	Cam_Init();
 	TIM4_Init();
 	/* Loop forever */
 	while (1) {
