@@ -34,8 +34,8 @@ int main(void) {
 	CAN1_Init(); //< Initialization of CAN1 - rail (motorboards, sensorboards)
 	CAN2_Init(); //< Initialization of CAN 2 - manip/labo
 
-//	Eth_Init(); //< Initialization of UART ethernet
-//	Eth_ReceiveData(); //< Starting listening on ethernet uart pins
+	Eth_Init(); //< Initialization of UART ethernet
+	Eth_ReceiveData(); //< Starting listening on ethernet uart pins
 
 	BT_Init(); //< Initialization of UART bluetooth
 	BT_ReceiveData(); //< Starting listening on bluetooth uart pins

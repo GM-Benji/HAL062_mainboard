@@ -47,8 +47,6 @@ static uint8_t decode_list_KNR(uint8_t *encoded, uint8_t *data,
  */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
-
 	// take advantage of both UART coms transfering the same information 
 	HAL_IWDG_Refresh(&hiwdg1);
 	UART_Decode(UART_ReceivedRaw);
@@ -64,8 +62,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		break;
 
 	default:
-//		COM_RunUartAction(&UART_MessageRecieved);
-		Error_Handler(MAINEErrorFunc_test, MAINError_test);
+		COM_RunUartAction(&UART_MessageRecieved);
 		break;
 	}
 
@@ -225,7 +222,7 @@ void Watchdog_Init(void) {
  * @see			:	UART frame documentation
  * *******************************************************************************
  */
-void Eth_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length) {
+void Eth_sendData(uint8_t ID, uint8_t *data, uint8_t data_length) {
 	uint8_t TxBuffer[19] = { [0] = '#', [1 ... 18] = 'X' };
 
 	encode_list_KNR((uint8_t*) &ID, TxBuffer + 1, 1);
@@ -246,7 +243,7 @@ void Eth_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length) {
  * @see			:	UART frame documentation
  * *******************************************************************************
  */
-void BT_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length) {
+void BT_sendData(uint8_t ID, uint8_t *data, uint8_t data_length) {
 	uint8_t TxBuffer[19] = { [0] = '#', [1 ... 18] = 'X' };
 
 	encode_list_KNR((uint8_t*) &ID, TxBuffer + 1, 1);
@@ -327,11 +324,11 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
 		return;
 	}
 
-//	if (huart->Instance == ethHuart.Instance) {
-//		Error_Handler(COMErrorFunc_Eth, COMError_Eth);
-//		return;
-//	}
-//	err_counter++;
+	if (huart->Instance == ethHuart.Instance) {
+		Error_Handler(COMErrorFunc_Eth, COMError_Eth);
+		return;
+	}
+	err_counter++;
 }
 
 static void encode_list_KNR(uint8_t *data, uint8_t *encoded,
