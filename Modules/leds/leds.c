@@ -23,11 +23,19 @@
 void Leds_init(void) {
 	GPIO_InitTypeDef gpio;
 	__HAL_RCC_GPIOG_CLK_ENABLE();
-	gpio.Pin = LED_ALL;
+	gpio.Pin = GPIO_PIN_0 | GPIO_PIN_14;
 	gpio.Mode = GPIO_MODE_OUTPUT_PP;
 	gpio.Pull = GPIO_PULLDOWN;
 	gpio.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(LED_PORT, &gpio);
+	HAL_GPIO_Init(GPIOB, &gpio);
+
+//	GPIO_InitTypeDef gpio;
+//	__HAL_RCC_GPIOG_CLK_ENABLE();
+//	gpio.Pin = LED_ALL;
+//	gpio.Mode = GPIO_MODE_OUTPUT_PP;
+//	gpio.Pull = GPIO_PULLDOWN;
+//	gpio.Speed = GPIO_SPEED_FREQ_LOW;
+//	HAL_GPIO_Init(LED_PORT, &gpio);
 }
 /* Functions ------------------------------------------------------------------*/
 
@@ -67,26 +75,31 @@ void Leds_toggle(uint32_t ledId) {
  * *****************************************************
  */
 void Leds_welcomeFLash(void) {
-	Leds_turnOff(LED_ALL);
-	HAL_Delay(200);
 
-	Leds_turnOn(LED_1);
-	HAL_Delay(200);
-	Leds_turnOn(LED_2);
-	HAL_Delay(200);
-	Leds_turnOn(LED_3);
-	HAL_Delay(200);
-	Leds_turnOn(LED_4);
-	HAL_Delay(200);
-	Leds_turnOn(LED_5);
-	HAL_Delay(200);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+	HAL_Delay(1000);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
 
-	Leds_turnOff(LED_ALL);
-	HAL_Delay(200);
-
-	Leds_turnOn(LED_ALL);
-	HAL_Delay(400);
-
-	Leds_turnOff(LED_ALL);
-	HAL_Delay(200);
+//	Leds_turnOff(LED_ALL);
+//	HAL_Delay(200);
+//
+//	Leds_turnOn(LED_1);
+//	HAL_Delay(200);
+//	Leds_turnOn(LED_2);
+//	HAL_Delay(200);
+//	Leds_turnOn(LED_3);
+//	HAL_Delay(200);
+//	Leds_turnOn(LED_4);
+//	HAL_Delay(200);
+//	Leds_turnOn(LED_5);
+//	HAL_Delay(200);
+//
+//	Leds_turnOff(LED_ALL);
+//	HAL_Delay(200);
+//
+//	Leds_turnOn(LED_ALL);
+//	HAL_Delay(400);
+//
+//	Leds_turnOff(LED_ALL);
+//	HAL_Delay(200);
 }

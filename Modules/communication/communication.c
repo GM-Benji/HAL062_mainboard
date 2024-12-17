@@ -46,7 +46,9 @@ static uint8_t decode_list_KNR(uint8_t *encoded, uint8_t *data,
  * *******************************************************************************
  */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	
+
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_14);
+
 	// take advantage of both UART coms transfering the same information 
 	HAL_IWDG_Refresh(&hiwdg1);
 	UART_Decode(UART_ReceivedRaw);
@@ -62,7 +64,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		break;
 
 	default:
-		COM_RunUartAction(&UART_MessageRecieved);
+//		COM_RunUartAction(&UART_MessageRecieved);
+		Error_Handler(MAINEErrorFunc_test, MAINError_test);
 		break;
 	}
 
@@ -151,12 +154,9 @@ bool BT_Init(void) {
 			!= HAL_OK) {
 //		Error_Handler();
 	}
-
-	// Most likely the error is here, this doesnt line up with NEW_ERA
-	if (HAL_UARTEx_DisableFifoMode(&btHuart) != HAL_OK) { 	
+	if (HAL_UARTEx_EnableFifoMode(&btHuart) != HAL_OK) {
 //		Error_Handler();
 	}
-
 	return 0;
 }
 
@@ -228,7 +228,7 @@ void Watchdog_Init(void) {
 void Eth_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length) {
 	uint8_t TxBuffer[19] = { [0] = '#', [1 ... 18] = 'X' };
 
-	encode_list_KNR(&ID, TxBuffer + 1, 1);
+	encode_list_KNR((uint8_t*) &ID, TxBuffer + 1, 1);
 	encode_list_KNR(data, TxBuffer + 3, data_length);
 
 	if (HAL_UART_Transmit(&btHuart, TxBuffer, 19, 50) != HAL_OK) {
@@ -249,7 +249,7 @@ void Eth_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length) {
 void BT_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length) {
 	uint8_t TxBuffer[19] = { [0] = '#', [1 ... 18] = 'X' };
 
-	encode_list_KNR(&ID, TxBuffer + 1, 1);
+	encode_list_KNR((uint8_t*) &ID, TxBuffer + 1, 1);
 	encode_list_KNR(data, TxBuffer + 3, data_length);
 
 	if (HAL_UART_Transmit(&btHuart, TxBuffer, 19, 50) != HAL_OK) {
@@ -327,11 +327,11 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
 		return;
 	}
 
-	if (huart->Instance == ethHuart.Instance) {
-		Error_Handler(COMErrorFunc_Eth, COMError_Eth);
-		return;
-	}
-	err_counter++;
+//	if (huart->Instance == ethHuart.Instance) {
+//		Error_Handler(COMErrorFunc_Eth, COMError_Eth);
+//		return;
+//	}
+//	err_counter++;
 }
 
 static void encode_list_KNR(uint8_t *data, uint8_t *encoded,

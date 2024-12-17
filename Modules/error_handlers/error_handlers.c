@@ -51,10 +51,10 @@ void Error_Handler(Error_function error_func, Error_code error_code) {
 	ERROR_CURRENT = error_func;
 
 	if (error_func != COMErrorFunc_Bt)
-		BT_sendData((uint8_t) MAINBOARD_ERROR_ID, (uint8_t*) error_code, 1);
+		BT_sendData((uint8_t) MAINBOARD_ERROR_ID, (uint8_t*) &error_code, 1);
 
 	if (error_func != COMErrorFunc_Eth)
-		Eth_sendData((uint8_t) MAINBOARD_ERROR_ID, (uint8_t*) error_code, 1);
+		Eth_sendData((uint8_t) MAINBOARD_ERROR_ID, (uint8_t*) &error_code, 1);
 
 	switch (error_func) {
 	case MAINEErrorFunc_test:
