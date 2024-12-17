@@ -47,7 +47,7 @@ bool BT_Init();
  * @params info	:	Information to send
  * *******************************************************************************
  */
-void BT_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length);
+void BT_sendData(uint8_t ID, uint8_t *data, uint8_t data_length);
 
 /**
  * *******************************************************************************
@@ -56,7 +56,7 @@ void BT_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length);
  * @params info	:	Information to send 
  * *******************************************************************************
  */
-void Eth_sendData(uint8_t ID, uint8_t data[8], uint8_t data_length);
+void Eth_sendData(uint8_t ID, uint8_t *data, uint8_t data_length);
 
 /**
  * *******************************************************************************

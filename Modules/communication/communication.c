@@ -52,6 +52,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	UART_Decode(UART_ReceivedRaw);
 
 	switch (UART_MessageRecieved.ID) {
+	case 0:
+		break;
+
 	case 10:
 		Lamp_handle(UART_MessageRecieved.data);
 		Lamp_setMaxValue(UART_MessageRecieved.data);
@@ -350,11 +353,11 @@ static uint8_t decode_list_KNR(uint8_t *encoded, uint8_t *data,
 		switch (encoded[i * 2]) {
 		case '0' ... '9':
 			data[i] = (encoded[i * 2] - 0x30) << 4;
-			continue;
+			break;
 
 		case 'A' ... 'F':
 			data[i] = (encoded[i * 2] - 0x37) << 4;
-			continue;
+			break;
 
 		case 'Z': // end of message
 			return i;
@@ -366,11 +369,11 @@ static uint8_t decode_list_KNR(uint8_t *encoded, uint8_t *data,
 		// decode last 4 bytes
 		switch (encoded[i * 2 + 1]) {
 		case '0' ... '9':
-			data[i] = (encoded[i * 2 + 1] - 0x30) << 4;
+			data[i] += (encoded[i * 2 + 1] - 0x30);
 			continue;
 
 		case 'A' ... 'F':
-			data[i] = (encoded[i * 2 + 1] - 0x37) << 4;
+			data[i] += (encoded[i * 2 + 1] - 0x37);
 			continue;
 
 		default:
