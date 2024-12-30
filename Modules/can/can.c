@@ -21,34 +21,28 @@
 
 /* Global variables -----------------------------------------------------------*/
 
+MessageTypeDef UART_MessageRecieved;
+
 FDCAN_HandleTypeDef hfdcan1;
 FDCAN_HandleTypeDef hfdcan2;
 
-FDCAN_TxHeaderTypeDef TxHeader_CAN1;
-FDCAN_TxHeaderTypeDef TxHeader_CAN2;
-FDCAN_RxHeaderTypeDef RxHeader;
-
-typedef union Angle {
-	uint32_t ui;
-	float f;
-} Angle;
-
-typedef union Speed {
-	uint32_t ui;
-	float f;
-} Speed;
-
-Angle angles[6];
-Speed speeds[6];
-
-uint8_t testData[] = { 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xFA, 0xFB, 0xFC };
-uint8_t RxMsg[8];
-
 /* Static variables -----------------------------------------------------------*/
 
-MessageTypeDef UART_MessageRecieved; //< Stores message from UART (bt or eth)
+static FDCAN_TxHeaderTypeDef TxHeader_CAN1;
+static FDCAN_TxHeaderTypeDef TxHeader_CAN2;
+static FDCAN_RxHeaderTypeDef RxHeader;
+
+static union Angle angles[6];
+static union Speed speeds[6];
+
+static const uint8_t testData[] = { 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xFA, 0xFB,
+		0xFC };
+static uint8_t RxMsg[8];
 
 /* Functions ------------------------------------------------------------------*/
+
+static void CAN1_processFifo0(void);
+static void CAN2_processFifo0(void);
 
 /**
  ******************************************************************************
@@ -321,7 +315,7 @@ void CAN2_transfer(void) {
 	Leds_toggle(LED_4);
 }
 
-void CAN1_processFifo0() {
+static void CAN1_processFifo0() {
 
 	if (HAL_FDCAN_GetRxMessage(&hfdcan1, FDCAN_RX_FIFO0, &RxHeader, RxMsg)
 			!= HAL_OK) {
@@ -331,8 +325,8 @@ void CAN1_processFifo0() {
 	}
 	switch (RxHeader.Identifier) {
 	case 158 ... 163:
-		angles[RxHeader.Identifier - 158].ui = RxMsg[3] | (RxMsg[2] << 8)
-				| (RxMsg[1] << 16) | (RxMsg[0] << 24);
+		angles[RxHeader.Identifier - 158].ui = (uint32_t) (RxMsg[3]
+				| (RxMsg[2] << 8) | (RxMsg[1] << 16) | (RxMsg[0] << 24));
 		break;
 
 	default:
@@ -347,7 +341,7 @@ void CAN1_processFifo0() {
 	}
 }
 
-void CAN2_processFifo0() {
+static void CAN2_processFifo0() {
 	if (HAL_FDCAN_GetRxMessage(&hfdcan2, FDCAN_RX_FIFO0, &RxHeader, RxMsg)
 			!= HAL_OK) {
 		/* Reception Error */
@@ -357,8 +351,8 @@ void CAN2_processFifo0() {
 
 	switch (RxHeader.Identifier) {
 	case 24 ... 29:
-		speeds[RxHeader.Identifier - 24].ui = RxMsg[3] | (RxMsg[2] << 8)
-				| (RxMsg[1] << 16) | (RxMsg[0] << 24);
+		speeds[RxHeader.Identifier - 24].ui = (uint32_t) (RxMsg[3]
+				| (RxMsg[2] << 8) | (RxMsg[1] << 16) | (RxMsg[0] << 24));
 		break;
 
 	case 60:

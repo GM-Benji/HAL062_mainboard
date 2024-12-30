@@ -14,6 +14,8 @@
 #include <stm32h7xx_hal.h>
 #include "leds/leds.h"
 
+/* Functions ------------------------------------------------------------------*/
+
 /*
  * ***************************************************
  * @ details	:	Initialization of GPIO using
@@ -29,7 +31,6 @@ void Leds_init(void) {
 	gpio.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(LED_PORT, &gpio);
 }
-/* Functions ------------------------------------------------------------------*/
 
 /*
  * ***************************************************
@@ -37,7 +38,7 @@ void Leds_init(void) {
  * 					only predefined macros
  * ***************************************************
  */
-void Leds_turnOn(uint32_t ledId) {
+void Leds_turnOn(uint16_t ledId) {
 	HAL_GPIO_WritePin(LED_PORT, ledId, GPIO_PIN_SET);
 }
 
@@ -47,7 +48,7 @@ void Leds_turnOn(uint32_t ledId) {
  * 					only predefined macros
  * ***************************************************
  */
-void Leds_turnOff(uint32_t ledId) {
+void Leds_turnOff(uint16_t ledId) {
 	HAL_GPIO_WritePin(LED_PORT, ledId, GPIO_PIN_RESET);
 }
 
@@ -56,7 +57,7 @@ void Leds_turnOff(uint32_t ledId) {
  * @ details	:	Toggling LED using predefined macro
  * *****************************************************
  */
-void Leds_toggle(uint32_t ledId) {
+void Leds_toggle(uint16_t ledId) {
 	HAL_GPIO_TogglePin(LED_PORT, ledId);
 }
 

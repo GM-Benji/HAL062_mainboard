@@ -35,7 +35,7 @@ void Leds_init(void);
  * @param ledId	: 	Led ID
  * ***************************************************
  */
-void Leds_turnOn(uint32_t ledId);
+void Leds_turnOn(uint16_t ledId);
 
 /*
  * ***************************************************
@@ -43,7 +43,7 @@ void Leds_turnOn(uint32_t ledId);
  * @param ledId	:	Led ID
  * ***************************************************
  */
-void Leds_turnOff(uint32_t ledId);
+void Leds_turnOff(uint16_t ledId);
 
 /*
  * ***************************************************
@@ -51,7 +51,7 @@ void Leds_turnOff(uint32_t ledId);
  * @param ledId	:	Led ID
  * ***************************************************
  */
-void Leds_toggle(uint32_t ledId);
+void Leds_toggle(uint16_t ledId);
 
 /*
  * *************************************************************

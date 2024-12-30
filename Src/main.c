@@ -87,7 +87,7 @@ void SystemClock_Config(void) {
 	RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
 	RCC_OscInitStruct.PLL.PLLFRACN = 0;
 	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-		Error_Handler(SRCErrorFunc_init, SRCError_mainOscConfig);
+		Error_Handler(SysClkErrorFunc_init, SysClkError_mainOscConfig);
 		return;
 	}
 
@@ -105,7 +105,7 @@ void SystemClock_Config(void) {
 	RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV1;
 
 	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK) {
-		Error_Handler(SRCErrorFunc_init, SRCError_mainClockConfig);
+		Error_Handler(SysClkErrorFunc_init, SysClkError_mainClockConfig);
 		return;
 	}
 }

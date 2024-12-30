@@ -22,6 +22,16 @@ typedef struct {
 	uint8_t data[8];
 } MessageTypeDef;
 
+union Angle {
+	uint32_t ui;
+	float f;
+};
+
+union Speed {
+	uint32_t ui;
+	float f;
+};
+
 /* Functions ------------------------------------------------------------------*/
 
 /**
@@ -55,9 +65,5 @@ void COM_RunUartAction(MessageTypeDef *message);
 
 void CAN1_transfer(void);
 void CAN2_transfer(void);
-
-void CAN1_processFifo0();
-void CAN2_processFifo0();
-
 
 #endif /* MODULES_CAN_CAN_H_ */

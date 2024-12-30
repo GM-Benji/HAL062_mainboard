@@ -17,12 +17,11 @@
 #include "can/can.h"
 #include <stm32h7xx_hal.h>
 
-uint8_t ERROR_COUNT = 0;
-bool ERROR_ACTIVE = 0;
-uint8_t ERROR_CURRENT = 0;
+static uint8_t ERROR_COUNT = 0;
+static bool ERROR_ACTIVE = 0;
+static Error_function ERROR_CURRENT = ErrorHandler_noErrorFunc;
 
 /* Functions ------------------------------------------------------------------- */
-
 
 /**
  * @see  documentation in the header file (error_handlers.h)
@@ -42,7 +41,7 @@ void Error_Handler(Error_function error_func, Error_code error_code) {
 		return;
 	}
 
-	if (ERROR_CURRENT != 0) {
+	if (ERROR_CURRENT != ErrorHandler_noErrorFunc) {
 		// we have two different errors
 		while (1) {
 		}
@@ -51,19 +50,24 @@ void Error_Handler(Error_function error_func, Error_code error_code) {
 	ERROR_CURRENT = error_func;
 
 	if (error_func != COMErrorFunc_Bt)
-		BT_sendData((uint8_t) MAINBOARD_ERROR_ID, (uint8_t*) &error_code, 1);
+		BT_sendData(MAINBOARD_ERROR_ID, (uint8_t*) &error_code, 1);
 
 	if (error_func != COMErrorFunc_Eth)
-		Eth_sendData((uint8_t) MAINBOARD_ERROR_ID, (uint8_t*) &error_code, 1);
+		Eth_sendData(MAINBOARD_ERROR_ID, (uint8_t*) &error_code, 1);
 
 	switch (error_func) {
+	case ErrorHandler_noErrorFunc:
+		ERROR_ACTIVE = 0;
+		break;
+
 	case MAINEErrorFunc_test:
 		ERROR_ACTIVE = 0;
 		break;
+
 	case CAN1ErrorFunc_init:
 		while (ERROR_ACTIVE) {
 			ERROR_ACTIVE = 0;
-			CAN1_Init();
+			CAN1_Init(); 
 		}
 		break;
 
@@ -113,7 +117,6 @@ void Error_Handler(Error_function error_func, Error_code error_code) {
 		}
 		break;
 
-	// TODO figure out watchdog
 	case COMErrorFunc_Bt:
 		ERROR_ACTIVE = 0;
 		break;
@@ -143,7 +146,7 @@ void Error_Handler(Error_function error_func, Error_code error_code) {
 		}
 		break;
 
-	case SRCErrorFunc_init:
+	case SysClkErrorFunc_init:
 		break;
 
 	default:
@@ -157,11 +160,13 @@ void Error_Handler(Error_function error_func, Error_code error_code) {
 	ERROR_COUNT = 0;
 	ERROR_CURRENT = 0;
 
-	//__enable_irq();
+//__enable_irq();
 
-	/// TODO: FInish Error handler!
+// TODO add fatal state notification 
+// example: set leds coresponding to error code, enabling debugging without coms 
 
 //	Leds_init();
 //	Leds_turnOff(LED_ALL);
 //	Leds_turnOn(LED_4);
 }
+

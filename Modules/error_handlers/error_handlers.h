@@ -9,7 +9,7 @@
 #ifndef ERROR_HANDLERS_ERROR_HANDLERS_H_
 #define ERROR_HANDLERS_ERROR_HANDLERS_H_
 
-#define MAINBOARD_ERROR_ID 0x69
+#define MAINBOARD_ERROR_ID ((uint8_t) 0x69)
 
 typedef enum {
 	MAINError_test,
@@ -54,15 +54,13 @@ typedef enum {
 	TIM7Error_configSync,
 	TIM16Error_baseInit,
 
-	SRCError_mainOscConfig,
-	SRCError_mainClockConfig,
-	HALError_CAN1,
-	HALError_CAN2,
-
+	SysClkError_mainOscConfig,
+	SysClkError_mainClockConfig,
 } Error_code;
 
 typedef enum {
-	MAINEErrorFunc_test = 1,
+	ErrorHandler_noErrorFunc,
+	MAINEErrorFunc_test,
 	CAN1ErrorFunc_init,
 	CAN1ErrorFunc_transfer,
 	CAN1ErrorFunc_fifo,
@@ -81,7 +79,7 @@ typedef enum {
 	TIM7ErrorFunc_init,
 	TIM16ErrorFunc_init,
 
-	SRCErrorFunc_init,
+	SysClkErrorFunc_init,
 } Error_function;
 
 /* Functions ----------------------------------------------------------------- */

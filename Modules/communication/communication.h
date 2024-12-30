@@ -31,20 +31,20 @@ struct commands {
  * @brief	:	UART ethernet initialization
  * *******************************************************************************
  */
-bool Eth_Init();
+bool Eth_Init(void);
 
 /**
  * *******************************************************************************
  * @brief	:	UART bluetooth initialization
  * *******************************************************************************
  */
-bool BT_Init();
+bool BT_Init(void);
 
 /**
  * *******************************************************************************
  * @brief		:	Sending data throgh bluetooth
- * @params ID	:	ID of data 
- * @params info	:	Information to send
+ * @param ID	:	ID of data 
+ * @param data	:	Information to send
  * *******************************************************************************
  */
 void BT_sendData(uint8_t ID, uint8_t *data, uint8_t data_length);
@@ -52,8 +52,8 @@ void BT_sendData(uint8_t ID, uint8_t *data, uint8_t data_length);
 /**
  * *******************************************************************************
  * @brief		:	Sending data throgh ethernet
- * @params ID	:	ID of data 
- * @params info	:	Information to send 
+ * @param ID	:	ID of data 
+ * @param data	:	Information to send 
  * *******************************************************************************
  */
 void Eth_sendData(uint8_t ID, uint8_t *data, uint8_t data_length);
@@ -61,7 +61,7 @@ void Eth_sendData(uint8_t ID, uint8_t *data, uint8_t data_length);
 /**
  * *******************************************************************************
  * @brief				:	Decoding data from UART
- * @params rawMessage	:	message from UART (bt or eth)
+ * @param rawMessage	:	message from UART (bt or eth)
  * *******************************************************************************
  */
 void UART_Decode(uint8_t *rawMessage);
@@ -71,14 +71,14 @@ void UART_Decode(uint8_t *rawMessage);
  * @brief				:	Begin listening on ethernet UART
  * *******************************************************************************
  */
-bool Eth_ReceiveData();
+bool Eth_ReceiveData(void);
 
 /**
  * *******************************************************************************
  * @brief				:	Begin listening on bluetooth UART
  * *******************************************************************************
  */
-bool BT_ReceiveData();
+bool BT_ReceiveData(void);
 
 /**
  * *******************************************************************************

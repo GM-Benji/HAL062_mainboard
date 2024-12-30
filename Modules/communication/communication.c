@@ -9,31 +9,42 @@
  ******************************************************************************
  */
 
+/* Includes ------------------------------------------------------------------*/
+
 #include <stm32h7xx_hal.h>
 #include <string.h>
+
 #include "can/can.h"
 #include "communication/communication.h"
 #include "camera/camera.h"
 #include "lamp/lamp.h"
 #include "error_handlers/error_handlers.h"
 
-static uint32_t err_counter = 0;
-extern MessageTypeDef UART_MessageRecieved; // struct from can.h representing message
+/* Global variables -----------------------------------------------------------*/
+
+struct commands uartCommands;
 
 UART_HandleTypeDef btHuart;
 UART_HandleTypeDef ethHuart;
 
-IWDG_HandleTypeDef hiwdg1;
-
-uint8_t UART_ReceivedRaw[19]; // check frame documentation
-uint8_t searching = 0u;
-uint8_t magnetosearching = 0u;
-uint8_t tutaj = 0u;
-
 DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
 
-struct commands uartCommands;
+/* Extern variables -----------------------------------------------------------*/
+
+extern MessageTypeDef UART_MessageRecieved; // struct from can.h representing message
+
+/* Static variables -----------------------------------------------------------*/
+
+static uint32_t err_counter = 0;
+static IWDG_HandleTypeDef hiwdg1;
+
+static uint8_t UART_ReceivedRaw[19]; // check frame documentation
+static uint8_t searching = 0u;
+static uint8_t magnetosearching = 0u; // UNUSED
+static uint8_t tutaj = 0u;
+
+/* Functions ------------------------------------------------------------------*/
 
 static void encode_list_KNR(uint8_t *data, uint8_t *encoded,
 		uint8_t data_length);
@@ -85,46 +96,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 	}
 }
-// Isnt this important?
-//
-//	if (huart->Instance == USART1) {
-//		UART_Decode(UART_ReceivedRaw);
-//		if (searching == 0) {
-//			COM_RunUartAction(&UART_MessageRecieved);
-//			UART_MessageRecieved.ID = 0;
-//			memset(&UART_MessageRecieved.data, 0x0u, 8);
-//			HAL_UART_Receive_IT(&ethHuart, UART_ReceivedRaw, 19);
-//			return;
-//		}
-//		if (searching == 1) {
-//			HAL_UART_Receive_IT(&ethHuart, UART_ReceivedRaw, 1);
-//			return;
-//		}
-//		if (searching == 2) {
-//			HAL_UART_Receive_IT(&ethHuart, UART_ReceivedRaw, 18);
-//			return;
-//		}
-//	}
-//	else if(huart->Instance == USART3)
-//	{
-//		UART_Decode(UART_ReceivedRaw);
-//		if (searching == 0) {
-//			COM_RunUartAction(&UART_MessageRecieved);
-//			UART_MessageRecieved.ID = 0;
-//			memset(&UART_MessageRecieved.data, 0x0u, 8);
-//			HAL_UART_Receive_IT(&btHuart, UART_ReceivedRaw, 19);
-//			return;
-//		}
-//		if (searching == 1) {
-//			HAL_UART_Receive_IT(&btHuart, UART_ReceivedRaw, 1);
-//			return;
-//		}
-//		if (searching == 2) {
-//			HAL_UART_Receive_IT(&btHuart, UART_ReceivedRaw, 18);
-//			return;
-//		}
-//	}
-//}
+
 
 /**
  * *******************************************************************************
@@ -143,6 +115,8 @@ bool BT_Init(void) {
 	btHuart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
 	btHuart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
 	btHuart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+
+	//TODO handle errors
 	if (HAL_UART_Init(&btHuart) != HAL_OK) {
 //		Error_Handler();
 	}
@@ -190,11 +164,11 @@ bool Eth_Init() {
 	ethHuart.Init.OverSampling = UART_OVERSAMPLING_16;
 	ethHuart.Init.Mode = UART_MODE_TX_RX;
 
+	// TODO add error handling here
 	HAL_UART_Init(&ethHuart);
 	HAL_UARTEx_SetRxFifoThreshold(&ethHuart, UART_RXFIFO_THRESHOLD_1_8);
 	HAL_UARTEx_SetTxFifoThreshold(&ethHuart, UART_RXFIFO_THRESHOLD_1_8);
 	HAL_UARTEx_EnableFifoMode(&ethHuart);
-
 	return 0;
 }
 
@@ -262,7 +236,7 @@ void BT_sendData(uint8_t ID, uint8_t *data, uint8_t data_length) {
  * @details		:	starting listening on bluetooth UART pins
  * *******************************************************************************
  */
-bool BT_ReceiveData() {
+bool BT_ReceiveData(void) {
 	if (HAL_UART_Receive_IT(&btHuart, UART_ReceivedRaw, 19) == HAL_OK)
 		return 0;
 	return 1;
@@ -273,7 +247,7 @@ bool BT_ReceiveData() {
  * @details		:	starting listening on bluetooth UART pins
  * *******************************************************************************
  */
-bool Eth_ReceiveData() {
+bool Eth_ReceiveData(void) {
 	if (HAL_UART_Receive_DMA(&ethHuart, UART_ReceivedRaw, 19) == HAL_OK)
 		return 0;
 	return 1;

@@ -6,6 +6,8 @@
  ******************************************************************************
  */
 
+/* Includes ------------------------------------------------------------------*/
+
 #include <stm32h7xx_hal.h>
 #include <stm32h7xx_hal_tim.h>
 #include <string.h>
@@ -16,9 +18,7 @@
 #include "lamp/lamp.h"
 #include "camera/camera.h"
 
-TIM_HandleTypeDef htim4;
-TIM_HandleTypeDef htim7;
-TIM_HandleTypeDef htim16;
+/* Extern variables -----------------------------------------------------------*/
 
 extern struct commands uartCommands;
 extern MessageTypeDef UART_MessageRecieved;
@@ -30,6 +30,14 @@ extern uint8_t Counter_green;
 extern uint8_t maxCounterRed;
 extern uint8_t maxCounterBlue;
 extern uint8_t maxCounterGreen;
+
+/* Global variables -----------------------------------------------------------*/
+
+TIM_HandleTypeDef htim4;
+TIM_HandleTypeDef htim7;
+TIM_HandleTypeDef htim16;
+
+/* Functions ------------------------------------------------------------------*/
 
 void TIM4_Init() {
 

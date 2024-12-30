@@ -1,9 +1,11 @@
+/* Includes ------------------------------------------------------------------*/
+
 #include <stm32h7xx_hal.h>
 #include <string.h>
 #include <lamp/lamp.h>
 #include "error_handlers/error_handlers.h"
 
-// look into merging this with the leds module
+/* Global variables -----------------------------------------------------------*/
 
 uint8_t Counter_red = 0;
 uint8_t Counter_blue = 0;
@@ -12,13 +14,15 @@ uint8_t maxCounterRed = 0;
 uint8_t maxCounterBlue = 0;
 uint8_t maxCounterGreen = 0;
 
+/* Functions ------------------------------------------------------------------*/
+
 void Lamp_setMaxValue(uint8_t *data) {
 	maxCounterRed = data[3];
 	maxCounterBlue = data[4];
 	maxCounterGreen = data[5];
 }
 
-void Lamp_init() {
+void Lamp_init(void) {
 	// Inicjalizacja pinów diod
 	GPIO_InitTypeDef GPIO_InitStruct;
 	GPIO_InitStruct.Pin = LAMP_1 | LAMP_2 | LAMP_3;
@@ -28,15 +32,15 @@ void Lamp_init() {
 	HAL_GPIO_Init(LAMP_PORT, &GPIO_InitStruct);
 }
 
-void Lamp_turnOn(uint32_t lampId) {
+void Lamp_turnOn(uint16_t lampId) {
 	HAL_GPIO_WritePin(LAMP_PORT, lampId, GPIO_PIN_SET);
 }
 
-void Lamp_turnOff(uint32_t lampId) {
+void Lamp_turnOff(uint16_t lampId) {
 	HAL_GPIO_WritePin(LAMP_PORT, lampId, GPIO_PIN_RESET);
 }
 
-void Lamp_toggle(uint32_t lampId) {
+void Lamp_toggle(uint16_t lampId) {
 	HAL_GPIO_TogglePin(LAMP_PORT, lampId);
 }
 
