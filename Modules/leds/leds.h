@@ -17,20 +17,8 @@
 #define LED_3	GPIO_PIN_4
 #define LED_4	GPIO_PIN_5
 #define LED_5	GPIO_PIN_6
-#define LEDS_PORT GPIOG
-
-
-/* Enumerates ------------------------------------------------------------------*/
-
-/*
- * ***************************************************
- * @brief	:	LEDs ID structure
- * ***************************************************
- */
-typedef enum {
-	LED1, LED2, LED3, LED4, LED5,
-} Leds_ID;
-
+#define LED_ALL LED_1 | LED_2 | LED_3 | LED_4 | LED_5 
+#define LED_PORT GPIOG
 
 /* Functions ------------------------------------------------------------------*/
 
@@ -47,7 +35,7 @@ void Leds_init(void);
  * @param ledId	: 	Led ID
  * ***************************************************
  */
-void Leds_turnOnLed(Leds_ID ledId);
+void Leds_turnOn(uint16_t ledId);
 
 /*
  * ***************************************************
@@ -55,15 +43,7 @@ void Leds_turnOnLed(Leds_ID ledId);
  * @param ledId	:	Led ID
  * ***************************************************
  */
-void Leds_turnOffLed(Leds_ID ledId);
-
-/*
- * ***************************************************
- * @brief 		:	Turns off all leds.
- * @param ledId	:	Led ID
- * ***************************************************
- */
-void Leds_turnOffAllLeds(void);
+void Leds_turnOff(uint16_t ledId);
 
 /*
  * ***************************************************
@@ -71,7 +51,7 @@ void Leds_turnOffAllLeds(void);
  * @param ledId	:	Led ID
  * ***************************************************
  */
-void Leds_toggleLed(Leds_ID ledId);
+void Leds_toggle(uint16_t ledId);
 
 /*
  * *************************************************************

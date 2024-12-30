@@ -3,7 +3,8 @@
 
 #include <stm32h7xx_hal.h>
 
-void handleCamera(uint8_t *data);
+void Cam_Init(void);
 
+void Cam_handle(uint8_t *data);
 
 #endif // MODULE_CAMERA_CAMERA_H

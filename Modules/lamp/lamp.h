@@ -1,18 +1,19 @@
 #ifndef MODULE_LAMP_LAMP_H
 #define MODULE_LAMP_LAMP_H
 
+#define LAMP_1 111
+#define LAMP_2 112
+#define LAMP_3 113
+#define LAMP_PORT GPIOC
 
-#define LED1_PIN 111
-#define LED2_PIN 112
-#define LED3_PIN 113
-#define LED_PORT GPIOC
-
-extern TIM_HandleTypeDef htim16;
-void GPIO_init(void);
+void Lamp_setMaxValue(uint8_t *data);
+void Lamp_init(void);
 void MX_TIM16_Init(void);
 
-void handleLED(uint8_t *data);
-void Set_Max_Value(uint8_t *data);
-extern TIM_HandleTypeDef htim16;
+void Lamp_turnOn(uint16_t lampId);
+void Lamp_turnOff(uint16_t lampId);
+void Lamp_toggle(uint16_t lampId);
+
+void Lamp_handle(uint8_t *data);
 
 #endif

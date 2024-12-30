@@ -67,12 +67,12 @@ void SysTick_Handler(void) {
 	if (work_led_state && work_led_cnt >= 100) {
 		work_led_cnt = 0u;
 		work_led_state = false;
-		Leds_turnOffLed(LED1);
+		Leds_turnOff(LED_1);
 	}
 	if (!work_led_state && work_led_cnt >= 400) {
 		work_led_cnt = 0u;
 		work_led_state = true;
-		Leds_turnOnLed(LED1);
+		Leds_turnOn(LED_1);
 	}
 	work_led_cnt++;
 }

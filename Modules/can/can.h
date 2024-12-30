@@ -22,6 +22,15 @@ typedef struct {
 	uint8_t data[8];
 } MessageTypeDef;
 
+union Angle {
+	uint32_t ui;
+	float f;
+};
+
+union Speed {
+	uint32_t ui;
+	float f;
+};
 
 /* Functions ------------------------------------------------------------------*/
 
@@ -30,21 +39,21 @@ typedef struct {
  * @brief		:	CAN1 initialization - outside (manipulator/lab)
  * *******************************************************************************
  */
-void FDCAN1_Init(void);
+void CAN1_Init(void);
 
 /**
  * *******************************************************************************
  * @brief		:	CAN2 initialization - rail (motorboards/sensorboards)
  * *******************************************************************************
  */
-void FDCAN2_Init(void);
+void CAN2_Init(void);
 
 /**
  * *******************************************************************************
  * @brief		:	Send test message via CAN1
  * *******************************************************************************
  */
-void Can_testMessage(void);
+void CAN_testMessage(void);
 
 /**
  * *******************************************************************************
@@ -54,25 +63,7 @@ void Can_testMessage(void);
  */
 void COM_RunUartAction(MessageTypeDef *message);
 
-/**
- * *******************************************************************************
- * @brief		:	Checks ID of message and pass to CAN1 or CAN2
- * *******************************************************************************
- */
-void transferTo(void);
-
-/**
- * *******************************************************************************
- * @brief		:	Passing message from UART to CAN1
- * *******************************************************************************
- */
-void transferToCan1(void);
-
-/**
- * *******************************************************************************
- * @brief		:	Passing message from UART to CAN2
- * *******************************************************************************
- */
-void transferToCan2(void);
+void CAN1_transfer(void);
+void CAN2_transfer(void);
 
 #endif /* MODULES_CAN_CAN_H_ */
